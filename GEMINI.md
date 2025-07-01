@@ -175,21 +175,21 @@ python -m pytest
 
 **Subprocess Management:**
 
-- Use asyncio subprocess with proper cleanup
-- Implement process pooling for concurrent requests
-- Handle CLI output parsing robustly
+- Use anyio subprocess with proper cleanup (IMPLEMENTED)
+- Implement timeout handling for long-running queries (IMPLEMENTED)
+- Handle CLI output parsing robustly (IMPLEMENTED - JSON and plain text)
 
 **Configuration:**
 
-- Support both environment variables and config files
-- Validate CLI path existence on startup
-- Cache model availability
+- Support environment variables (IMPLEMENTED - GEMINI_CLI_PATH)
+- Validate CLI path existence with multiple search locations (IMPLEMENTED)
+- Cache model availability (TODO)
 
 **Platform Support:**
 
-- Test on Windows, macOS, Linux
-- Handle path separators correctly
-- Support different Gemini CLI versions
+- Test on Windows, macOS, Linux (IMPLEMENTED - cross-platform CLI discovery)
+- Handle path separators correctly (IMPLEMENTED - using pathlib)
+- Support different Gemini CLI versions (IMPLEMENTED - flexible argument parsing)
 
 
 ## 5. Quality Assurance

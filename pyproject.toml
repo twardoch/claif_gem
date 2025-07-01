@@ -11,10 +11,19 @@
 #------------------------------------------------------------------------------
 [project]
 name = 'claif_gem' # Package name on PyPI
-description = '' # Short description
+description = 'Google Gemini provider for CLAIF (Command-Line AI Framework)' # Short description
 readme = 'README.md' # Path to README file
-requires-python = '>=3.10' # Minimum Python version
+requires-python = '>=3.12' # Minimum Python version
 keywords = [
+    'ai',
+    'gemini',
+    'google',
+    'llm',
+    'cli',
+    'claif',
+    'provider',
+    'artificial-intelligence',
+    'command-line',
 ] # Keywords for PyPI search
 dynamic = ["version"] # Fields set dynamically at build time
 
@@ -33,7 +42,14 @@ classifiers = [
 ]
 
 dependencies = [
-    "claif",
+    "claif>=1.0.1",
+    "anyio>=4.0.0",
+    "click",
+    "shell-functools",
+    "icecream",
+    "fire>=0.5.0",
+    "rich>=13.0.0",
+    "loguru>=0.7.0",
 ]
 
 # Author information
@@ -73,23 +89,38 @@ test = [
     'pytest-cov>=6.0.0', # Coverage plugin for pytest - Keep pytest-cov as is, update if newer pytest-cov version is required
     'pytest-xdist>=3.6.1', # Parallel test execution - Keep pytest-xdist as is, update if newer pytest-xdist version is required
     'pytest-benchmark[histogram]>=5.1.0', # Benchmarking plugin - Keep pytest-benchmark as is, update if newer pytest-benchmark version is required
-    'pytest-asyncio>=0.25.3', # Async test support - Keep pytest-asyncio as is, update if newer pytest-asyncio version is required
+    'pytest-asyncio>=0.26.0', # Async test support - Keep pytest-asyncio as is, update if newer pytest-asyncio version is required
     'coverage[toml]>=7.6.12',
 ]
 
 docs = [
-    "sphinx>=7.2.6",
-    "sphinx-rtd-theme>=2.0.0",
-    "sphinx-autodoc-typehints>=2.0.0",
-    "myst-parser>=3.0.0", # Markdown support in Sphinx
+    "sphinx>=8.2.3",
+    "sphinx-rtd-theme>=3.0.2",
+    "sphinx-autodoc-typehints>=3.2.0",
+    "myst-parser>=4.0.1", # Markdown support in Sphinx
 ]
 
 # All optional dependencies combined
 all = [
-    'pytest>=7.0.0',
-    'pytest-cov>=4.0.0',
-    'ruff>=0.1.0',
-    'mypy>=1.0.0',
+    # Include all dev dependencies
+    'pre-commit>=4.1.0',
+    'ruff>=0.9.7',
+    'mypy>=1.15.0',
+    'absolufy-imports>=0.3.1',
+    'pyupgrade>=3.19.1',
+    'isort>=6.0.1',
+    # Include all test dependencies
+    'pytest>=8.3.4',
+    'pytest-cov>=6.0.0',
+    'pytest-xdist>=3.6.1',
+    'pytest-benchmark[histogram]>=5.1.0',
+    'pytest-asyncio>=0.25.3',
+    'coverage[toml]>=7.6.12',
+    # Include all docs dependencies
+    "sphinx>=8.2.3",
+    "sphinx-rtd-theme>=3.0.2",
+    "sphinx-autodoc-typehints>=3.2.0",
+    "myst-parser>=4.0.1", # Markdown support in Sphinx
 ]
 
 #------------------------------------------------------------------------------
@@ -97,6 +128,8 @@ all = [
 # Entry points for command-line executables installed with the package.
 #------------------------------------------------------------------------------
 [project.scripts]
+claif-gem = "claif_gem.cli:main"
+
 [project.entry-points."claif.plugins"]
 gem = "claif_gem"
 
@@ -122,15 +155,44 @@ build-backend = 'hatchling.build' # Specifies Hatchling as the build backend
 [tool.hatch.build]
 # Include package data files
 include = [
+    "src/claif_gem/*.py",
     "src/claif_gem/py.typed", # For better type checking support
-    "src/claif_gem/data/**/*", # Include data files if any
-
 ]
-exclude = ["**/__pycache__", "**/.pytest_cache", "**/.mypy_cache"]
+exclude = [
+    "**/__pycache__",
+    "**/.pytest_cache",
+    "**/.mypy_cache",
+    "**/*.pyc",
+    "**/*.pyo",
+    "**/*~",
+    "**/.DS_Store",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/claif_gem"]
 reproducible = true
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/tests",
+    "LICENSE",
+    "README.md",
+    "pyproject.toml",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+]
+exclude = [
+    "/.github",
+    "/.specstory",
+    "/reference",
+    "**/__pycache__",
+    "**/.pytest_cache",
+    "**/.mypy_cache",
+    "**/*.pyc",
+    "**/*.pyo",
+]
 
 
 # Version control system hook configuration
@@ -352,6 +414,7 @@ compare = [
 [tool.ruff]
 target-version = "py310"
 line-length = 120
+extend-exclude = [".git", ".venv", "venv", "dist", "build"]
 
 # Linting rules configuration
 [tool.ruff.lint]
@@ -419,8 +482,6 @@ unfixable = [
     'F401', # Don't automatically remove unused imports - may be needed later
 
 ]
-# Configure extend-exclude to ignore specific directories
-extend-exclude = [".git", ".venv", "venv", "dist", "build"]
 
 # isort configuration within Ruff
 [tool.ruff.lint.isort]
