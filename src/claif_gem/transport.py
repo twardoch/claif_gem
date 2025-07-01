@@ -8,9 +8,9 @@ import sys
 import uuid
 from collections.abc import AsyncIterator
 from pathlib import Path
+from typing import Any
 
 import anyio
-from anyio.streams.text import TextReceiveStream
 from loguru import logger
 
 try:
@@ -24,12 +24,11 @@ class GeminiTransport:
     """Transport for communicating with Gemini CLI."""
 
     def __init__(self):
-        self.process: anyio.Process | None = None
+        self.process: Any | None = None
         self.session_id = str(uuid.uuid4())
 
     async def connect(self) -> None:
         """Initialize transport (no-op for subprocess)."""
-        pass
 
     async def disconnect(self) -> None:
         """Cleanup transport."""
@@ -38,7 +37,8 @@ class GeminiTransport:
                 self.process.terminate()
                 await self.process.wait()
             except Exception as e:
-                logger.warning(f"Error during disconnect: {e}")
+                # Disconnect errors during cleanup are usually not critical
+                logger.debug(f"Error during disconnect (expected during cleanup): {e}")
             finally:
                 self.process = None
 
@@ -48,80 +48,67 @@ class GeminiTransport:
         env = self._build_env()
 
         if options.verbose:
-            logger.debug(f"Running command: {' '.join(command)}")
+            cmd_str = " ".join(command)
+            logger.debug(f"Running command: {cmd_str}")
 
         try:
+            import asyncio
+
             start_time = anyio.current_time()
 
-            async with await anyio.open_process(
-                command,
+            # Use asyncio subprocess instead of anyio
+            process = await asyncio.create_subprocess_exec(
+                *command,
                 env=env,
                 cwd=options.cwd,
-                stdout=anyio.subprocess.PIPE,
-                stderr=anyio.subprocess.PIPE,
-            ) as process:
-                self.process = process
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
 
-                # Read output
-                stdout_stream = TextReceiveStream(process.stdout)
-                stderr_stream = TextReceiveStream(process.stderr)
+            self.process = process
 
-                stdout_lines = []
-                stderr_lines = []
+            # Wait for process and get all output at once
+            stdout_data, stderr_data = await process.communicate()
 
-                async with anyio.create_task_group() as tg:
+            duration = anyio.current_time() - start_time
 
-                    async def read_stdout():
-                        async for line in stdout_stream:
-                            stdout_lines.append(line)
+            # Decode the output
+            stdout_output = stdout_data.decode("utf-8").strip() if stdout_data else ""
+            stderr_output = stderr_data.decode("utf-8").strip() if stderr_data else ""
 
-                    async def read_stderr():
-                        async for line in stderr_stream:
-                            stderr_lines.append(line)
-
-                    tg.start_soon(read_stdout)
-                    tg.start_soon(read_stderr)
-
-                # Wait for process to complete
-                await process.wait()
-
-                duration = anyio.current_time() - start_time
-
-                # Check for errors
-                if process.returncode != 0:
-                    error_msg = "".join(stderr_lines) or "Unknown error"
-                    yield ResultMessage(
-                        error=True,
-                        message=f"Gemini CLI error: {error_msg}",
-                        duration=duration,
-                        session_id=self.session_id,
-                    )
-                    return
-
-                # Parse output
-                output = "".join(stdout_lines).strip()
-
-                if output:
-                    # Try to parse as JSON first
-                    try:
-                        data = json.loads(output)
-                        if isinstance(data, dict) and "content" in data:
-                            yield GeminiMessage(
-                                content=data["content"],
-                                role=data.get("role", "assistant"),
-                            )
-                        else:
-                            # Fallback to plain text
-                            yield GeminiMessage(content=output)
-                    except json.JSONDecodeError:
-                        # Plain text response
-                        yield GeminiMessage(content=output)
-
-                # Send result message
+            # Check for errors
+            if process.returncode != 0:
+                error_msg = stderr_output or "Unknown error"
                 yield ResultMessage(
+                    error=True,
+                    message=f"Gemini CLI error: {error_msg}",
                     duration=duration,
                     session_id=self.session_id,
                 )
+                return
+
+            # Parse output
+            if stdout_output:
+                # Try to parse as JSON first
+                try:
+                    data = json.loads(stdout_output)
+                    if isinstance(data, dict) and "content" in data:
+                        yield GeminiMessage(
+                            content=data["content"],
+                            role=data.get("role", "assistant"),
+                        )
+                    else:
+                        # Fallback to plain text
+                        yield GeminiMessage(content=stdout_output)
+                except json.JSONDecodeError:
+                    # Plain text response
+                    yield GeminiMessage(content=stdout_output)
+
+            # Send result message
+            yield ResultMessage(
+                duration=duration,
+                session_id=self.session_id,
+            )
 
         except Exception as e:
             logger.error(f"Transport error: {e}")
@@ -137,11 +124,11 @@ class GeminiTransport:
         command = [cli_path]
 
         # Add options
-        if options.auto_approve:
-            command.append("-a")
+        if options.auto_approve or options.yes_mode:
+            command.append("-y")  # --yolo mode
 
-        if options.yes_mode:
-            command.append("-y")
+        if options.verbose:
+            command.append("-d")  # --debug mode
 
         if options.model:
             command.extend(["-m", options.model])

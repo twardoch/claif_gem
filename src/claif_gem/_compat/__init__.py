@@ -3,7 +3,6 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any
 
 
 class Provider(Enum):
@@ -62,8 +61,6 @@ class Config:
 
 class TransportError(Exception):
     """Transport-related errors."""
-
-    pass
 
 
 def load_config(config_file: str | None = None) -> Config:

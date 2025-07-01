@@ -13,7 +13,7 @@ from claif_gem.client import query as gemini_query
 from claif_gem.types import GeminiOptions
 
 try:
-    from .__version__ import __version__
+    from claif_gem.__version__ import __version__
 except ImportError:
     __version__ = "0.1.0-dev"
 
