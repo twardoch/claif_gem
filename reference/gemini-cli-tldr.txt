@@ -1,0 +1,252 @@
+
+# GOOGLE GEMINI CLI JS
+
+This document provides a comprehensive overview of the Gemini CLI, its
+architecture, commands, configuration, and tools.
+
+## 1\. Introduction
+
+The Gemini CLI is a powerful command-line interface that allows you to
+interact with Gemini models. It provides a rich, interactive terminal
+experience for a wide range of tasks, from code explanation and generation to
+workflow automation.
+
+### 1.1. Architecture Overview
+
+The Gemini CLI is composed of two main packages:
+
+  * **CLI Package (`packages/cli`):** The user-facing part of the CLI, responsible for handling input, rendering output, and managing the user experience.
+
+  * **Core Package (`packages/core`):** The backend of the CLI, which communicates with the Gemini API, manages tools, and processes requests.
+
+The interaction between these components follows a simple flow: the user
+provides input to the CLI, which sends it to the core. The core processes the
+input, interacts with the Gemini API and any necessary tools, and then sends
+the final response back to the CLI to be displayed to the user.
+
+## 2\. Authentication
+
+To use the Gemini CLI, you need to authenticate with Google's AI services. The
+following authentication methods are supported:
+
+  * **Login with Google (Gemini Code Assist):** This is the recommended method for most users. It allows you to log in with your Google account and provides a generous free tier.
+
+  * **Gemini API Key:** You can use an API key from Google AI Studio for more advanced use cases or increased request capacity.
+
+  * **Vertex AI:** For users who need to use a specific model or have enterprise-level requirements, the Gemini CLI can be configured to use Vertex AI.
+
+For detailed instructions on how to set up each authentication method, please
+refer to the official [Authentication
+documentation](https://www.google.com/search?q=https://github.com/google-
+gemini/gemini-cli/blob/main/docs/cli/authentication.md "null").
+
+## 3\. Core Concepts
+
+### 3.1. CLI Package (`packages/cli`)
+
+The CLI package is responsible for the user-facing aspects of the Gemini CLI.
+Its key functions include:
+
+  * **Input Processing:** Handling user input, including slash commands, at commands, and shell commands.
+
+  * **History Management:** Keeping track of your command history for easy recall.
+
+  * **Display Rendering:** Presenting the output from the Gemini model and tools in a clear and readable format.
+
+  * **Theme and UI Customization:** Allowing you to customize the appearance of the CLI to your liking.
+
+  * **CLI Configuration Settings:** Managing your CLI settings through `settings.json` files.
+
+### 3.2. Core Package (`packages/core`)
+
+The Core package acts as the backend for the Gemini CLI. Its main
+responsibilities are:
+
+  * **API Client:** Communicating with the Google Gemini API.
+
+  * **Prompt Construction:** Building effective prompts for the Gemini model, incorporating conversation history, tool definitions, and instructional context.
+
+  * **Tool Management:** Registering and executing available tools.
+
+  * **State Management:** Keeping track of the conversation state.
+
+  * **Server-side Configuration:** Managing core-specific configurations, such as API key access and model selection.
+
+### 3.3. Tools
+
+Tools are individual modules that extend the capabilities of the Gemini model,
+allowing it to interact with your local environment. The Core package invokes
+these tools based on requests from the Gemini model.
+
+## 4\. CLI Commands
+
+The Gemini CLI supports a variety of commands to help you manage your session
+and control its behavior.
+
+### 4.1. Slash Commands (`/`)
+
+Slash commands provide meta-level control over the CLI itself.  
+  
+**Command**| **Description**  
+---|---  
+`/help` or `/?`| Display help information about the Gemini CLI.  
+`/quit` or `/exit`| Exit the Gemini CLI.  
+`/clear`| Clear the terminal screen.  
+`/history`| View your command history.  
+`/theme`| Change the visual theme of the CLI.  
+`/auth`| Change the authentication method.  
+`/editor`| Set your preferred external editor.  
+`/bug`| Submit a bug report.  
+`/stats`| Display session statistics.  
+`/memory`| Manage the AI's instructional context.  
+`/tools`| List available tools.  
+`/mcp`| List configured Model Context Protocol (MCP) servers.  
+`/restore`| Restore project files to a previous state.  
+`/compress`| Replace the chat context with a summary.  
+  
+### 4.2. At Commands (`@`)
+
+At commands are used to include the content of files or directories as part of
+your prompt to Gemini.
+
+  * `@<path_to_file_or_directory>`: Inject the content of the specified file or files into your current prompt.
+
+### 4.3. Shell Commands (`!`)
+
+The `!` prefix lets you interact with your system's shell directly from within
+the Gemini CLI.
+
+  * `!<shell_command>`: Execute the given shell command in your system's default shell.
+
+  * `!`: Toggle shell mode.
+
+## 5\. Configuration
+
+The Gemini CLI can be configured through `settings.json` files, environment
+variables, and command-line arguments.
+
+### 5.1. `settings.json`
+
+You can configure the Gemini CLI using `settings.json` files in two locations:
+
+  * **User Settings:** `~/.gemini/settings.json` (applies to all sessions for the current user)
+
+  * **Project Settings:** `.gemini/settings.json` (applies only to the specific project)
+
+Available settings include:
+
+**Setting**| **Description**  
+---|---  
+`theme`| Sets the visual theme for the CLI.  
+`sandbox`| Enables or disables sandboxing for tool execution.  
+`coreTools`| Specifies a list of core tools to be made available to the model.  
+`excludeTools`| Specifies a list of core tools to be excluded from the model.  
+`toolDiscoveryCommand`| Defines a custom shell command for discovering tools.  
+`toolCallCommand`| Defines a custom shell command for calling a specific tool.  
+`mcpServers`| Configures connections to one or more MCP servers.  
+`checkpointing`| Configures the checkpointing feature.  
+`preferredEditor`| Specifies the preferred editor for viewing diffs.  
+`telemetry`| Configures logging and metrics collection.  
+`usageStatisticsEnabled`| Enables or disables the collection of usage
+statistics.  
+`hideTips`| Enables or disables helpful tips in the CLI interface.  
+  
+### 5.2. Environment Variables
+
+  * `GEMINI_API_KEY`: Your API key for the Gemini API.
+
+  * `GOOGLE_API_KEY`: Your Google Cloud API key.
+
+  * `GOOGLE_CLOUD_PROJECT`: Your Google Cloud Project ID.
+
+  * `GEMINI_MODEL`: The default Gemini model to use.
+
+  * `GEMINI_SANDBOX`: Enables or disables sandbox mode.
+
+### 5.3. Command-Line Arguments
+
+  * `--model <model_name>` or `-m <model_name>`: Specifies the Gemini model to use for the session.
+
+  * `--prompt <your_prompt>` or `-p <your_prompt>`: Passes a prompt directly to the command.
+
+  * `--sandbox` or `-s`: Enables sandbox mode for the session.
+
+  * `--debug` or `-d`: Enables debug mode for the session.
+
+  * `--help` or `-h`: Displays help information.
+
+## 6\. Tools API
+
+The Gemini CLI features a robust system for defining, registering, and
+executing tools.
+
+### 6.1. Built-in Tools
+
+The Core package comes with a suite of pre-defined tools, including:
+
+  * **File System Tools:** `list_directory`, `read_file`, `write_file`, `glob`, `search_file_content`, `replace`
+
+  * **Execution Tools:** `run_shell_command`
+
+  * **Web Tools:** `web_fetch`, `google_web_search`
+
+  * **Memory Tools:** `save_memory`
+
+### 6.2. Tool Execution Flow
+
+  1. The Gemini model decides to use a tool and returns a `FunctionCall` in its response.
+
+  2. The Core package receives the request and looks up the tool in the `ToolRegistry`.
+
+  3. The tool's parameters are validated.
+
+  4. If necessary, the user is prompted for confirmation.
+
+  5. The tool's `execute()` method is called.
+
+  6. The result is processed and sent back to the Gemini model.
+
+  7. The final response is displayed to the user.
+
+### 6.3. Extending with Custom Tools
+
+You can extend the capabilities of the Gemini CLI by defining custom tools
+through a `toolDiscoveryCommand` in `settings.json` or by setting up one or
+more MCP servers.
+
+For more detailed information on the Tools API, please refer to the official
+[Tools API
+documentation](https://www.google.com/search?q=https://github.com/google-
+gemini/gemini-cli/blob/main/docs/core/tools-api.md "null").
+
+Options:
+  -m, --model                    Model      [string] [default: "gemini-2.5-pro"]
+  -p, --prompt                   Prompt. Appended to input on stdin (if any).
+                                                                        [string]
+  -s, --sandbox                  Run in sandbox?                       [boolean]
+      --sandbox-image            Sandbox image URI.                     [string]
+  -d, --debug                    Run in debug mode?   [boolean] [default: false]
+  -a, --all_files                Include ALL files in context?
+                                                      [boolean] [default: false]
+      --show_memory_usage        Show memory usage in status bar
+                                                      [boolean] [default: false]
+  -y, --yolo                     Automatically accept all actions (aka YOLO
+                                 mode, see
+                                 https://www.youtube.com/watch?v=xvFZjo5PgG0 for
+                                 more details)?       [boolean] [default: false]
+      --telemetry                Enable telemetry? This flag specifically
+                                 controls if telemetry is sent. Other
+                                 --telemetry-* flags set specific values but do
+                                 not enable telemetry on their own.    [boolean]
+      --telemetry-target         Set the telemetry target (local or gcp).
+                                 Overrides settings files.
+                                              [string] [choices: "local", "gcp"]
+      --telemetry-otlp-endpoint  Set the OTLP endpoint for telemetry. Overrides
+                                 environment variables and settings files.
+                                                                        [string]
+      --telemetry-log-prompts    Enable or disable logging of user prompts for
+                                 telemetry. Overrides settings files.  [boolean]
+  -c, --checkpointing            Enables checkpointing of file edits
+                                                      [boolean] [default: false]
+  -v, --version                  Show version number                   [boolean]
+  -h, --help                     Show help                             [boolean]
