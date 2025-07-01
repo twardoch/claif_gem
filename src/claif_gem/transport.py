@@ -1,8 +1,9 @@
-# this_file: src/claif_gem/transport.py
-"""Transport layer for Gemini CLI communication."""
+# this_file: claif_gem/src/claif_gem/transport.py
+"""Transport layer for CLAIF Gemini CLI communication."""
 
 import json
 import os
+import shlex
 import shutil
 import sys
 import uuid
@@ -13,10 +14,7 @@ from typing import Any
 import anyio
 from loguru import logger
 
-try:
-    from claif.common import TransportError
-except ImportError:
-    from claif_gem._compat import TransportError
+from claif.common import InstallError, TransportError, find_executable
 from claif_gem.types import GeminiMessage, GeminiOptions, ResultMessage
 
 
@@ -120,8 +118,19 @@ class GeminiTransport:
 
     def _build_command(self, prompt: str, options: GeminiOptions) -> list[str]:
         """Build command line arguments."""
-        cli_path = self._find_cli()
-        command = [cli_path]
+        cli_path = self._find_cli(options.exec_path)
+
+        # Check if this is a single file path (possibly with spaces) or a command with arguments
+        path_obj = Path(cli_path)
+        if path_obj.exists():
+            # This is a file path, treat as single argument even if it has spaces
+            command = [cli_path]
+        elif " " in cli_path:
+            # This is a command with arguments (e.g., "deno run script.js")
+            command = shlex.split(cli_path)
+        else:
+            # Simple command name
+            command = [cli_path]
 
         # Add options
         if options.auto_approve or options.yes_mode:
@@ -145,49 +154,39 @@ class GeminiTransport:
         # Add prompt
         command.extend(["-p", prompt])
 
+        # Add images if supported (Note: Gemini CLI may not support this yet)
+        if options.images:
+            for image_path in options.images:
+                command.extend(["-i", image_path])
+
         return command
 
     def _build_env(self) -> dict:
         """Build environment variables."""
-        env = os.environ.copy()
+        try:
+            from claif.common.utils import inject_claif_bin_to_path
+
+            env = inject_claif_bin_to_path()
+        except ImportError:
+            env = os.environ.copy()
+
         env["GEMINI_SDK"] = "1"
         env["CLAIF_PROVIDER"] = "gemini"
         return env
 
-    def _find_cli(self) -> str:
-        """Find Gemini CLI executable."""
-        # Check if specified in environment
-        if cli_path := os.environ.get("GEMINI_CLI_PATH"):
-            if Path(cli_path).exists():
-                return cli_path
+    def _find_cli(self, exec_path: str | None = None) -> str:
+        """Find Gemini CLI executable using simplified 3-mode logic.
 
-        # Search in PATH
-        if cli := shutil.which("gemini"):
-            return cli
+        Args:
+            exec_path: Optional explicit path provided by user
 
-        # Search common locations
-        search_paths = [
-            Path.home() / ".local" / "bin" / "gemini",
-            Path("/usr/local/bin/gemini"),
-            Path("/opt/gemini/bin/gemini"),
-        ]
+        Returns:
+            Path to the executable
 
-        # Add npm global paths
-        if sys.platform == "win32":
-            npm_prefix = os.environ.get("APPDATA", "")
-            if npm_prefix:
-                search_paths.append(Path(npm_prefix) / "npm" / "gemini.cmd")
-        else:
-            search_paths.extend(
-                [
-                    Path.home() / ".npm-global" / "bin" / "gemini",
-                    Path("/usr/local/lib/node_modules/.bin/gemini"),
-                ]
-            )
-
-        for path in search_paths:
-            if path.exists():
-                return str(path)
-
-        msg = "Gemini CLI not found. Please install it or set GEMINI_CLI_PATH environment variable."
-        raise TransportError(msg)
+        Raises:
+            TransportError: If executable cannot be found
+        """
+        try:
+            return find_executable("gemini", exec_path)
+        except InstallError as e:
+            raise TransportError(str(e)) from e

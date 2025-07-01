@@ -3,6 +3,7 @@
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 try:
     from claif.common import Message, MessageRole
@@ -23,6 +24,8 @@ class GeminiOptions:
     model: str | None = None
     timeout: int | None = None
     verbose: bool = False
+    exec_path: str | None = None
+    images: list[str] | None = None
 
 
 @dataclass
@@ -38,6 +41,22 @@ class GeminiMessage:
             role=MessageRole.ASSISTANT,
             content=self.content,
         )
+
+
+@dataclass
+class GeminiResponse:
+    """Response from Gemini CLI."""
+
+    content: str
+    role: str = "assistant"
+    model: str | None = None
+    usage: dict[str, Any] | None = None
+    raw_response: dict[str, Any] | None = None
+
+    def to_claif_message(self) -> Message:
+        """Convert to CLAIF message."""
+        role = MessageRole.ASSISTANT if self.role == "assistant" else MessageRole.USER
+        return Message(role=role, content=self.content)
 
 
 @dataclass

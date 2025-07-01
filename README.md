@@ -2,7 +2,7 @@
 
 ## Quickstart
 
-CLAIF_GEM provides a Python interface and CLI wrapper for Google's Gemini AI models. It integrates the Gemini CLI tool into the CLAIF framework, enabling you to query Gemini models with a simple command or Python API call.
+CLAIF_GEM provides a Python interface and CLI wrapper for Google's Gemini AI models. It integrates the Gemini CLI tool into the CLAIF framework, enabling you to query Gemini models with a simple command or Python API call. Version 1.0.4 improves subprocess reliability by switching to native asyncio.
 
 ```bash
 pip install claif_gem && claif-gem query "Explain quantum computing in one sentence"

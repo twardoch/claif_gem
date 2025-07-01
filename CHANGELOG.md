@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2025-07-01
+
+### Changed
+- Switched from anyio to asyncio for subprocess handling for improved reliability
+- Simplified transport layer by using native asyncio subprocess management
+- Changed process type annotation from `anyio.Process` to `Any` for flexibility
+- Improved command string formatting for debug logging
+- Removed empty pass statement in connect method
+
+### Added
+- Added reference documentation file (gemini-cli-usage.txt)
+
+### Fixed
+- Fixed potential subprocess handling issues by using native asyncio instead of anyio
+- Improved error handling during process cleanup operations
+- Changed disconnect error logging from WARNING to DEBUG level for cleaner output during cleanup
+
+### Removed
+- Removed unused TextReceiveStream import from anyio
+- Removed empty lines in _compat/__init__.py
+
+## [1.0.3] - 2025-07-01
+
+[Previous version - no changelog entry]
+
+## [1.0.2] - 2025-07-01
+
+[Previous version - no changelog entry]
+
+## [1.0.1] - 2025-07-01
+
+### Fixed
+- Reduced log noise by changing disconnect errors from WARNING to DEBUG level
+- Disconnect errors during cleanup are now logged as debug messages since they're expected during normal operation
+- Improved error message clarity with context about cleanup operations
+
+### Changed
+- Better handling of process termination errors with more appropriate logging levels
+- Cleaner command output with reduced warning noise
+
 ## [Unreleased]
 
 ### Changed
