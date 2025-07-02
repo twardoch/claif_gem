@@ -26,6 +26,7 @@ class GeminiOptions:
     verbose: bool = False
     exec_path: str | None = None
     images: list[str] | None = None
+    retry_count: int = 3
 
 
 @dataclass
