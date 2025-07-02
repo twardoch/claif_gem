@@ -151,7 +151,7 @@ class TestGeminiTransport:
 
         results = [result async for result in transport.send_query("test", GeminiOptions(retry_count=2))]
 
-        assert mock_execute_query.call_count == 3  # Initial + 2 retries
+        assert mock_execute_query.call_count == 3
         assert len(results) == 1
         assert results[0].error
         assert "failed after 2 retries" in results[0].message

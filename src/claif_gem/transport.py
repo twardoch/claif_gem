@@ -57,9 +57,10 @@ class GeminiTransport:
         # Get retry settings from options or use defaults
         retry_count = getattr(options, "retry_count", 3)
         retry_delay = getattr(options, "retry_delay", 1.0)
+        no_retry = getattr(options, "no_retry", False)
 
         # If retry is disabled, execute once without retry
-        if retry_count <= 0:
+        if no_retry or retry_count <= 0:
             async for result in self._execute_query(command, env, options, prompt):
                 yield result
             return
@@ -74,10 +75,10 @@ class GeminiTransport:
 
         try:
             async for attempt in AsyncRetrying(
-                stop=stop_after_attempt(retry_count),
+                stop=stop_after_attempt(retry_count + 1),
                 wait=wait_exponential(multiplier=retry_delay, min=retry_delay, max=retry_delay * 10),
                 retry=retry_if_exception_type(retry_exceptions),
-                reraise=True,
+                reraise=False,
             ):
                 with attempt:
                     logger.debug(f"Gemini query attempt {attempt.retry_state.attempt_number}/{retry_count}")
@@ -137,7 +138,15 @@ class GeminiTransport:
             if process.returncode != 0:
                 error_msg = stderr_output or "Unknown error"
                 # Check if it's a retryable error
-                if any(indicator in error_msg.lower() for indicator in ["timeout", "connection", "network"]):
+                retryable_indicators = [
+                    "timeout", "connection", "network", "quota", "exhausted", 
+                    "rate limit", "too many requests", "503", "502", "429"
+                ]
+                is_retryable = any(indicator in error_msg.lower() for indicator in retryable_indicators)
+                
+                # If retry is disabled, always return error message instead of raising
+                no_retry = getattr(options, "no_retry", False)
+                if is_retryable and not no_retry:
                     msg = f"Gemini CLI error (retryable): {error_msg}"
                     raise TransportError(msg)
                 else:

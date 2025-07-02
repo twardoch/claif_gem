@@ -60,6 +60,7 @@ class GeminiCLI:
         show_metrics: bool = False,
         images: str | None = None,
         exec: str | None = None,
+        no_retry: bool = False,
     ) -> None:
         """Execute a query to Gemini.
 
@@ -76,6 +77,7 @@ class GeminiCLI:
             show_metrics: Show response metrics
             images: Comma-separated image paths or URLs
             exec: Executable path or method (bun/deno/npx)
+            no_retry: Disable retry on failure
         """
         # Process images
         image_paths = None
@@ -92,6 +94,7 @@ class GeminiCLI:
             verbose=self._config.verbose,
             images=image_paths,
             exec_path=exec,
+            no_retry=no_retry,
         )
 
         start_time = time.time()
