@@ -37,12 +37,11 @@ class GeminiTransport:
         """Cleanup transport."""
         if self.process:
             try:
-                self.process.terminate()
+                await self.process.terminate()
                 await self.process.wait()
+                self.process = None
             except Exception as e:
-                # Disconnect errors during cleanup are usually not critical
                 logger.debug(f"Error during disconnect (expected during cleanup): {e}")
-            finally:
                 self.process = None
 
     async def send_query(self, prompt: str, options: GeminiOptions) -> AsyncIterator[GeminiMessage | ResultMessage]:

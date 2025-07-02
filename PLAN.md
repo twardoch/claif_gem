@@ -182,60 +182,72 @@ claif_gem/
 
 ## Success Criteria for v1.x
 
-1. **Reliability**: 99.9% success rate for subprocess operations
-2. **Performance**: < 100ms overhead per operation
-3. **Testing**: 80%+ test coverage with mocks
-4. **Error Handling**: Clear, actionable error messages
-5. **Cross-Platform**: Verified on Windows, macOS, Linux
-6. **Documentation**: Complete user and API docs
-7. **Installation**: Auto-install works everywhere
+1.  **Reliability**: 99.9% success rate for subprocess operations
+2.  **Performance**: < 100ms overhead per operation
+3.  **Testing**: 80%+ test coverage with mocks
+4.  **Error Handling**: Clear, actionable error messages
+5.  **Cross-Platform**: Verified on Windows, macOS, Linux
+6.  **Documentation**: Complete user and API docs
+7.  **Installation**: Auto-install works everywhere
 
 ## Development Priorities
 
 ### Immediate (v1.0.7)
-1. Add comprehensive test suite
-2. Fix subprocess cleanup issues
-3. Improve error messages
+1.  Add pytest test suite for all modules
+2.  Test transport.py subprocess handling
+3.  Test client.py message conversion
+4.  Test CLI discovery logic
+5.  Test command construction
+6.  Test install.py functionality
+7.  Mock subprocess operations
+8.  Test timeout and cancellation
+9.  Achieve 80%+ code coverage
+10. Handle process termination cleanly
+11. Fix resource leaks
+12. Proper async cleanup
+13. Add context to subprocess errors
+14. Clear API key error messages
+15. Better error display
 
 ### Short-term (v1.1.0)
-1. Cross-platform testing
-2. Complete documentation
-3. Performance optimization
+1.  Cross-platform testing
+2.  Complete documentation
+3.  Performance optimization
 
 ### Medium-term (v1.2.0)
-1. Advanced Gemini features
-2. Response caching
-3. Direct API option
+1.  Advanced Gemini features
+2.  Response caching
+3.  Direct API option
 
 ## Non-Goals for v1.x
 
-- Complex UI features
-- Custom protocol extensions
-- Database persistence
-- Multi-user support
-- Response transformation
+-   Complex UI features
+-   Custom protocol extensions
+-   Database persistence
+-   Multi-user support
+-   Response transformation
 
 ## Testing Strategy
 
 ### Unit Test Focus
-- Mock all anyio.open_process calls
-- Test CLI discovery paths
-- Verify command construction
-- Test JSON/text parsing
-- Validate error handling
+-   Mock all anyio.open_process calls
+-   Test CLI discovery paths
+-   Verify command construction
+-   Test JSON/text parsing
+-   Validate error handling
 
 ### Integration Test Focus
-- Real CLI execution
-- Cross-platform paths
-- Installation verification
-- Network failure scenarios
-- Model selection
+-   Real CLI execution
+-   Cross-platform paths
+-   Installation verification
+-   Network failure scenarios
+-   Model selection
 
 ### Performance Testing
-- Subprocess spawn overhead
-- Response parsing speed
-- Memory usage profiling
-- Concurrent operations
-- Large response handling
+-   Subprocess spawn overhead
+-   Response parsing speed
+-   Memory usage profiling
+-   Concurrent operations
+-   Large response handling
 
 Keep the codebase lean and focused on being a reliable Gemini provider for Claif.
