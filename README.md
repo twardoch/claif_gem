@@ -1,106 +1,152 @@
-#`claif_gem` - Google Gemini Provider for Claif
+# claif_gem - Gemini Provider for Claif
 
 ## Quickstart
 
-Claif_GEM provides a Python interface and CLI wrapper for Google's Gemini AI models. It integrates the Gemini CLI tool into the Claif framework, enabling you to query Gemini models with a simple command or Python API call. Version 1.0.4 improves subprocess reliability by switching to native asyncio.
-
 ```bash
-pip install claif_gem && claif-gem query "Explain quantum computing in one sentence"
+# Install and start using Gemini
+pip install claif_gem
+claif-gem query "Explain quantum computing in simple terms"
+
+# Or use it with the Claif framework
+pip install claif[all]
+claif query "Write a haiku about Python" --provider gemini
+
+# Stream responses with live display
+claif-gem stream "Tell me a story about AI"
+
+# Use auto-approve mode for faster responses
+claif-gem query "Analyze this code" --auto-approve --yes-mode
 ```
 
-Claif_GEM is the Google Gemini provider implementation for the Claif (Command-Line Artificial Intelligence Framework). It wraps the [Gemini CLI](https://github.com/google-gemini/gemini-cli/) to integrate Google's Gemini AI models into the unified Claif ecosystem.
+## What is claif_gem?
 
-## What is`claif_gem`?
+`claif_gem` is the Google Gemini provider for the Claif framework. It wraps the [Gemini CLI](https://github.com/google-gemini/gemini-cli/) tool to integrate Google's powerful Gemini language models into the unified Claif ecosystem through subprocess management and clean message translation.
 
-Claif_GEM provides a Python interface and command-line wrapper for the Google Gemini CLI tool. It enables seamless integration of Google's Gemini language models with the Claif framework through subprocess management and message translation.
-
-Key features:
-- **Subprocess-based integration** with the Gemini CLI binary
-- **Automatic CLI discovery** across multiple platforms (Windows, macOS, Linux)
-- **Fire-based CLI** with rich terminal output for direct usage
-- **Async/await support** for efficient concurrent operations
-- **Auto-approval and yes-mode** for streamlined workflows
-- **Flexible configuration** via environment variables and options
-- **Robust error handling** with timeout protection
+**Key Features:**
+- **Subprocess-based integration** - Reliable communication with Gemini CLI
+- **Auto-approve & yes-mode** - Streamlined workflows without interruptions
+- **Cross-platform CLI discovery** - Works on Windows, macOS, and Linux
+- **Async/await throughout** - Built on anyio for efficiency
+- **Rich CLI interface** - Beautiful terminal output with Fire
+- **Type-safe API** - Comprehensive type hints for IDE support
+- **Robust error handling** - Timeout protection and graceful failures
 
 ## Installation
 
 ### Prerequisites
 
-You need to have the Gemini CLI installed. Install it via npm:
+Install the Gemini CLI via npm:
+
 ```bash
 npm install -g @google/gemini-cli
 ```
 
 Or set the path to an existing installation:
+
 ```bash
 export GEMINI_CLI_PATH=/path/to/gemini
 ```
 
-### From PyPI
+### Basic Installation
+
 ```bash
+# Core package only
 pip install claif_gem
+
+# With Claif framework
+pip install claif claif_gem
+
+# All Claif providers
+pip install claif[all]
 ```
 
-### From Source
+### Installing Gemini CLI with Claif
+
+```bash
+# Using Claif's installer (recommended)
+pip install claif && claif install gemini
+
+# Or using claif_gem's installer
+python -m claif_gem.install
+
+# Manual installation with bun (faster)
+bun add -g @google/gemini-cli
+```
+
+### Development Installation
+
 ```bash
 git clone https://github.com/twardoch/claif_gem.git
 cd claif_gem
-pip install -e .
-```
-
-### With Claif Framework
-```bash
-# Install Claif with all providers
-pip install claif[all]
-
-# Or just with Gemini support
-pip install claif claif_gem
+pip install -e ".[dev,test]"
 ```
 
 ## CLI Usage
 
-Claif_GEM provides a Fire-based CLI for direct interaction with Gemini:
+`claif_gem` provides a Fire-based CLI for direct interaction with Gemini.
 
 ### Basic Commands
 
 ```bash
 # Simple query
-claif-gem query "Explain quantum computing"
+claif-gem query "Explain machine learning"
 
 # Query with specific model
-claif-gem query "Write a haiku" --model gemini-2.5-pro
+claif-gem query "Write Python code for binary search" --model gemini-2.5-pro
 
-# Query with parameters
-claif-gem query "Analyze this code" --temperature 0.3 --max-context 8000
+# Set parameters
+claif-gem query "Analyze this data" --temperature 0.3 --max-context 8000
 
 # With system prompt
-claif-gem query "Translate to Spanish" --system "You are a professional translator"
+claif-gem query "Translate to French" --system "You are a professional translator"
 
 # Stream responses
-claif-gem stream "Tell me a story"
+claif-gem stream "Create a detailed tutorial on REST APIs"
 
 # Health check
 claif-gem health
 
-# List available models
+# List models
 claif-gem models
 
 # Show configuration
 claif-gem config show
 ```
 
-### Options
+### Advanced Options
 
-- `--model`: Specify Gemini model (default: gemini-2.5-pro)
-- `--temperature`: Control randomness (0-1)
-- `--system`: Set system prompt for context
-- `--auto-approve`: Auto-approve tool usage (default: true)
-- `--yes-mode`: Automatically confirm all prompts (default: true)
-- `--max-context`: Maximum context length
-- `--timeout`: Query timeout in seconds
-- `--show-metrics`: Display response metrics
-- `--verbose`: Enable debug output
+```bash
+# Control tool approval
+claif-gem query "Process these files" --auto-approve  # Auto-approve tool use
+claif-gem query "Analyze code" --no-auto-approve      # Manual approval
+
+# Yes mode for all prompts
+claif-gem query "Refactor this module" --yes-mode
+
+# Verbose output for debugging
+claif-gem query "Debug this error" --verbose
+
+# Custom timeout
+claif-gem query "Complex analysis" --timeout 300
+
+# Show response metrics
+claif-gem query "Quick question" --show-metrics
+```
+
+### Configuration Management
+
+```bash
+# Show current config
+claif-gem config show
+
+# Set values
+claif-gem config set --default-model gemini-2.5-pro
+claif-gem config set --auto-approve true
+claif-gem config set --timeout 180
+
+# Save configuration
+claif-gem config save
+```
 
 ## Python API Usage
 
@@ -136,17 +182,19 @@ asyncio.run(main())
 from claif_gem.client import GeminiClient
 from claif_gem.types import GeminiOptions
 
-async def main():
+async def use_client():
     client = GeminiClient()
+    
     options = GeminiOptions(
         model="gemini-2.5-pro",
-        verbose=True
+        verbose=True,
+        max_context_length=16000
     )
     
     async for message in client.query("What is machine learning?", options):
         print(f"[{message.role}]: {message.content}")
 
-asyncio.run(main())
+asyncio.run(use_client())
 ```
 
 ### Transport Layer Access
@@ -155,15 +203,63 @@ asyncio.run(main())
 from claif_gem.transport import GeminiTransport
 from claif_gem.types import GeminiOptions
 
-async def main():
+async def direct_transport():
     transport = GeminiTransport()
-    options = GeminiOptions(timeout=60)
     
-    async for response in transport.send_query("Complex analysis", options):
+    options = GeminiOptions(
+        timeout=120,
+        auto_approve=True
+    )
+    
+    async for response in transport.send_query("Explain async programming", options):
         if hasattr(response, 'content'):
             print(response.content)
 
-asyncio.run(main())
+asyncio.run(direct_transport())
+```
+
+### Error Handling
+
+```python
+from claif.common import ProviderError, TransportError
+from claif_gem import query, GeminiOptions
+
+async def safe_query():
+    try:
+        options = GeminiOptions(timeout=60)
+        async for message in query("Complex task", options):
+            print(message.content)
+            
+    except TransportError as e:
+        print(f"Transport error: {e}")
+        # Retry with different settings
+        
+    except ProviderError as e:
+        print(f"Gemini error: {e}")
+        
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+
+asyncio.run(safe_query())
+```
+
+### Using with Claif Framework
+
+```python
+from claif import query as claif_query, Provider, ClaifOptions
+
+async def use_with_claif():
+    options = ClaifOptions(
+        provider=Provider.GEMINI,
+        model="gemini-2.5-pro",
+        temperature=0.5,
+        system_prompt="You are a data science expert"
+    )
+    
+    async for message in claif_query("Explain neural networks", options):
+        print(message.content)
+
+asyncio.run(use_with_claif())
 ```
 
 ## How It Works
@@ -176,9 +272,9 @@ asyncio.run(main())
 ├─────────────────────┤
 │   Claif Core       │
 ├─────────────────────┤
-│   `claif_gem`        │
+│   claif_gem        │
 │  ┌───────────────┐  │
-│  │   __init__.py │  │ ← Main entry point,Claif interface
+│  │   __init__.py │  │ ← Main entry point, Claif interface
 │  ├───────────────┤  │
 │  │    cli.py     │  │ ← Fire-based CLI commands
 │  ├───────────────┤  │
@@ -195,46 +291,135 @@ asyncio.run(main())
 └─────────────────────┘
 ```
 
-### Component Details
+### Core Components
 
-#### 1. **Main Module** (`__init__.py`)
-- Provides the `query()` function as the main entry point
-- Converts Claif's `ClaifOptions` to `GeminiOptions`
-- Delegates to the client module for execution
-- Exports public API: `query` and `GeminiOptions`
+#### Main Module (`__init__.py`)
 
-#### 2. **CLI Module** (`cli.py`)
-- Fire-based command-line interface
-- Commands: `query`, `stream`, `health`, `models`, `config`
+Entry point providing the `query()` function:
+
+```python
+async def query(
+    prompt: str,
+    options: ClaifOptions | None = None
+) -> AsyncIterator[Message]:
+    """Query Gemini with Claif-compatible interface."""
+    # Convert options
+    gemini_options = _convert_options(options) if options else GeminiOptions()
+    
+    # Delegate to client
+    async for message in _client.query(prompt, gemini_options):
+        yield message
+```
+
+Features:
+- Thin wrapper design
+- Option conversion between Claif and Gemini formats
+- Module-level client instance
+- Clean async generator interface
+
+#### CLI Module (`cli.py`)
+
+Fire-based command-line interface:
+
+```python
+class GeminiCLI:
+    def query(self, prompt: str, **kwargs):
+        """Execute a query to Gemini."""
+        
+    def stream(self, prompt: str, **kwargs):
+        """Stream responses in real-time."""
+        
+    def health(self):
+        """Check Gemini CLI availability."""
+        
+    def config(self, action: str = "show", **kwargs):
+        """Manage configuration."""
+```
+
+Features:
 - Rich console output with progress indicators
-- Async execution with proper error handling
-- Response formatting and metrics display
+- Response formatting and metrics
+- Async execution with error handling
+- Configuration persistence
 
-#### 3. **Client Module** (`client.py`)
-- `GeminiClient` class manages the query lifecycle
-- Coordinates with transport layer
-- Converts Gemini messages to Claif message format
-- Module-level `_client` instance for convenience
+#### Client Module (`client.py`)
 
-#### 4. **Transport Module** (`transport.py`)
-- `GeminiTransport` handles subprocess communication
-- CLI discovery across platforms (npm paths, common locations)
-- Command-line argument construction from options
-- Async subprocess execution with anyio
-- Output parsing (JSON and plain text)
-- Error handling and timeout management
+Manages the query lifecycle:
 
-#### 5. **Types Module** (`types.py`)
-- `GeminiOptions`: Configuration dataclass
-- `GeminiMessage`: Response message type
-- `ResultMessage`: Metadata and error information
-- Type conversion methods to Claif formats
+```python
+class GeminiClient:
+    def __init__(self):
+        self.transport = GeminiTransport()
+        
+    async def query(self, prompt: str, options: GeminiOptions):
+        # Send query via transport
+        async for gemini_msg in self.transport.send_query(prompt, options):
+            # Convert to Claif format
+            yield self._convert_message(gemini_msg)
+```
+
+Features:
+- Transport lifecycle management
+- Message format conversion
+- Error propagation
+- Clean separation of concerns
+
+#### Transport Module (`transport.py`)
+
+Handles subprocess communication:
+
+```python
+class GeminiTransport:
+    async def send_query(self, prompt: str, options: GeminiOptions):
+        # Find CLI
+        cli_path = self._find_cli_path()
+        
+        # Build command
+        cmd = self._build_command(cli_path, prompt, options)
+        
+        # Execute and stream
+        async with await anyio.open_process(cmd) as proc:
+            async for line in proc.stdout:
+                yield self._parse_line(line)
+```
+
+Key methods:
+- `_find_cli_path()` - Multi-location CLI discovery
+- `_build_command()` - Safe argument construction
+- `_parse_output_line()` - JSON and plain text parsing
+- Timeout management with process cleanup
+
+#### Types Module (`types.py`)
+
+Type definitions and conversions:
+
+```python
+@dataclass
+class GeminiOptions:
+    model: str | None = None
+    temperature: float | None = None
+    system_prompt: str | None = None
+    auto_approve: bool = True
+    yes_mode: bool = True
+    max_context_length: int | None = None
+    timeout: int | None = None
+    verbose: bool = False
+
+@dataclass
+class GeminiMessage:
+    role: str
+    content: str
+    metadata: dict[str, Any] | None = None
+    
+    def to_claif_message(self) -> Message:
+        """Convert to Claif format."""
+```
 
 ### Message Flow
 
-1. **Query Entry**: User calls `query()` with prompt and options
-2. **Option Translation**:Claif options → GeminiOptions
-3. **Client Processing**: GeminiClient validates and prepares query
+1. **User Input** → CLI command or API call
+2. **Option Translation** → ClaifOptions → GeminiOptions
+3. **Client Processing** → GeminiClient prepares query
 4. **Transport Execution**:
    - Find Gemini CLI binary
    - Build command with arguments
@@ -244,12 +429,13 @@ asyncio.run(main())
    - Try JSON parsing first
    - Fallback to plain text
    - Convert to GeminiMessage
-6. **Message Conversion**: GeminiMessage →Claif Message
-7. **Async Yield**: Messages yielded to caller
+6. **Message Conversion** → GeminiMessage → Claif Message
+7. **Async Yield** → Messages yielded to caller
 
 ### CLI Discovery
 
-The transport layer searches for the Gemini CLI in this order:
+The transport searches for Gemini CLI in this order:
+
 1. `GEMINI_CLI_PATH` environment variable
 2. System PATH (`which gemini`)
 3. Common installation paths:
@@ -268,33 +454,16 @@ The Gemini CLI is invoked with arguments based on options:
 ```bash
 gemini \
   -m <model> \
-  -a  # auto-approve
-  -y  # yes-mode
-  -t <temperature> \
-  -s <system-prompt> \
+  -a          # auto-approve
+  -y          # yes-mode
+  -t <temp>   # temperature
+  -s <prompt> # system prompt
   --max-context <length> \
-  -p "prompt"
+  -p "user prompt"
 ```
 
-### Environment Variables
+### Code Structure
 
-- `GEMINI_CLI_PATH`: Path to Gemini CLI binary
-- `GEMINI_SDK=1`: Set by transport to indicate SDK usage
-- `Claif_PROVIDER=gemini`: Provider identification
-
-## Why Use`claif_gem`?
-
-1. **Unified Interface**: Access Gemini through the standard Claif API
-2. **Cross-Platform**: Automatic CLI discovery works on Windows, macOS, Linux
-3. **Async First**: Built on anyio for efficient concurrent operations
-4. **Rich CLI**: Fire-based interface with progress indicators and formatting
-5. **Type Safety**: Full type hints for better IDE support
-6. **Error Handling**: Robust subprocess management with timeout protection
-7. **Flexible Configuration**: Environment variables, options, and config files
-
-## Development
-
-### Project Structure
 ```
 claif_gem/
 ├── src/claif_gem/
@@ -302,46 +471,172 @@ claif_gem/
 │   ├── cli.py           # Fire CLI implementation
 │   ├── client.py        # Client orchestration
 │   ├── transport.py     # Subprocess management
-│   └── types.py         # Type definitions
+│   ├── types.py         # Type definitions
+│   └── install.py       # CLI installation helper
 ├── tests/
 │   └── test_package.py  # Basic tests
 ├── pyproject.toml       # Package configuration
-└── README.md            # This file
+├── README.md            # This file
+└── CLAUDE.md            # Development guide
 ```
 
-### Running Tests
+### Configuration
+
+Environment variables:
+- `GEMINI_CLI_PATH` - Path to Gemini CLI binary
+- `GEMINI_SDK=1` - Set by transport to indicate SDK usage
+- `CLAIF_PROVIDER=gemini` - Provider identification
+
+Config file (`~/.claif/config.json`):
+```json
+{
+    "providers": {
+        "gemini": {
+            "model": "gemini-2.5-pro",
+            "auto_approve": true,
+            "yes_mode": true,
+            "max_context_length": 32000,
+            "timeout": 180
+        }
+    }
+}
+```
+
+## Installation with Bun
+
+For faster installation, use Bun:
+
 ```bash
-# Install development dependencies
+# Install bun
+curl -fsSL https://bun.sh/install | bash
+
+# Install Gemini CLI
+bun add -g @google/gemini-cli
+
+# Or use Claif's bundled installer
+pip install claif
+claif install gemini  # Uses bun internally
+```
+
+Benefits of Bun:
+- 10x faster npm installs
+- Creates standalone executables
+- No Node.js version conflicts
+- Cross-platform compatibility
+
+## Why Use claif_gem?
+
+### 1. **Unified Interface**
+- Access Gemini through standard Claif API
+- Switch between providers with one parameter
+- Consistent error handling across providers
+
+### 2. **Cross-Platform**
+- Automatic CLI discovery on all platforms
+- Platform-specific path handling
+- Works in diverse environments
+
+### 3. **Developer Experience**
+- Full type hints for IDE support
+- Rich CLI with progress indicators
+- Clean async/await patterns
+- Comprehensive error messages
+
+### 4. **Production Ready**
+- Robust subprocess management
+- Timeout protection
+- Graceful error recovery
+- Extensive logging
+
+### 5. **Flexible Configuration**
+- Environment variables
+- Config files
+- CLI arguments
+- Sensible defaults
+
+## Best Practices
+
+1. **Use auto-approve for trusted operations** - Speeds up workflows
+2. **Set appropriate timeouts** - Prevent hanging on complex queries
+3. **Enable verbose mode for debugging** - See full subprocess communication
+4. **Use system prompts** - Set context for better responses
+5. **Configure max context length** - Based on your use case
+6. **Handle errors gracefully** - Implement retry logic
+7. **Use streaming for long responses** - Better user experience
+
+## Contributing
+
+See [CLAUDE.md](CLAUDE.md) for development guidelines.
+
+### Development Setup
+
+```bash
+# Clone repository
+git clone https://github.com/twardoch/claif_gem.git
+cd claif_gem
+
+# Install with dev dependencies
 pip install -e ".[dev,test]"
 
 # Run tests
 pytest
 
-# Run with coverage
-pytest --cov=claif_gem
+# Format code
+ruff format src/claif_gem tests
 
-# Run linting
-ruff check src/claif_gem
-ruff format src/claif_gem
+# Lint
+ruff check src/claif_gem tests
+
+# Type check
+mypy src/claif_gem
 ```
 
-## Contributing
+### Testing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Ensure all tests pass
-6. Submit a pull request
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=claif_gem --cov-report=html
+
+# Run specific test
+pytest tests/test_transport.py -v
+
+# Test CLI commands
+python -m claif_gem.cli health
+python -m claif_gem.cli models
+```
 
 ## License
 
-MIT License - see LICENSE file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
+
+Copyright (c) 2025 Adam Twardoch
 
 ## Links
 
-- [GitHub Repository](https://github.com/twardoch/claif_gem)
-- [PyPI Package](https://pypi.org/project/claif_gem/)
-- [Claif Framework](https://github.com/twardoch/claif)
-- [Gemini CLI](https://github.com/google-gemini/gemini-cli/)
-- [Google AI Documentation](https://ai.google.dev/)
+### claif_gem Resources
+
+- [GitHub Repository](https://github.com/twardoch/claif_gem) - Source code
+- [PyPI Package](https://pypi.org/project/claif_gem/) - Latest release
+- [Issue Tracker](https://github.com/twardoch/claif_gem/issues) - Bug reports
+- [Discussions](https://github.com/twardoch/claif_gem/discussions) - Q&A
+
+### Related Projects
+
+**Claif Ecosystem:**
+- [Claif](https://github.com/twardoch/claif) - Main framework
+- [claif_cla](https://github.com/twardoch/claif_cla) - Claude provider
+- [claif_cod](https://github.com/twardoch/claif_cod) - Codex provider
+
+**Upstream Projects:**
+- [Gemini CLI](https://github.com/google-gemini/gemini-cli/) - Google's CLI
+- [Google AI Studio](https://ai.google.dev/) - Gemini documentation
+- [Google AI Python SDK](https://github.com/google/generative-ai-python) - Python SDK
+
+**Tools & Libraries:**
+- [Fire](https://github.com/google/python-fire) - CLI framework
+- [Rich](https://github.com/Textualize/rich) - Terminal formatting
+- [anyio](https://github.com/agronholm/anyio) - Async compatibility
+- [Bun](https://bun.sh) - Fast JavaScript runtime

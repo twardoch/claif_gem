@@ -1,134 +1,179 @@
-# claif_gem TODO List - Quality Focus v1.1
+# claif_gem TODO List - v1.x Stable MVP
 
-## ✅ COMPLETED - MVP v1.0
+## Immediate Priority (v1.0.7)
 
-### Auto-Install Support (Issue #201) - ✅ COMPLETED
+### Unit Testing
+- [ ] Add pytest test suite for all modules
+- [ ] Test transport.py subprocess handling
+- [ ] Test client.py message conversion
+- [ ] Test CLI discovery logic
+- [ ] Test command construction
+- [ ] Test install.py functionality
+- [ ] Mock subprocess operations
+- [ ] Test timeout and cancellation
+- [ ] Achieve 80%+ code coverage
 
+### Subprocess Cleanup
+- [ ] Handle process termination cleanly
+- [ ] Fix resource leaks
+- [ ] Proper async cleanup
 
+### Error Messages
+- [ ] Add context to subprocess errors
+- [ ] Clear API key error messages
+- [ ] Better error display
 
+## Short-term Priority (v1.1.0)
 
+### Integration Testing
+- [ ] Test with real Gemini CLI
+- [ ] Test auto-install flow
+- [ ] Test different response formats
+- [ ] Test error conditions
+- [ ] Cross-platform compatibility
 
-### Rich Dependencies - ✅ COMPLETED
+### Cross-Platform Testing
+- [ ] Test all discovery paths
+- [ ] Handle Windows .cmd files
+- [ ] Support custom install paths
+- [ ] Verify executable permissions
+- [ ] Handle path spaces correctly
+- [ ] Windows path handling
+- [ ] macOS security permissions
+- [ ] Linux distribution variations
+- [ ] WSL compatibility
+- [ ] Docker container support
 
+### Documentation
+- [ ] Installation guide
+- [ ] API key setup guide
+- [ ] Model selection guide
+- [ ] Auto-approve usage
+- [ ] Troubleshooting section
 
+## Medium-term Priority (v1.2.0)
 
+### Advanced Gemini Features
+- [ ] Full options support
+- [ ] Response metadata
+- [ ] Extended CLI options
 
+### Response Caching
+- [ ] Implement caching layer
+- [ ] Cache invalidation
+- [ ] TTL management
 
-### Compatibility Layer Cleanup - ✅ COMPLETED
+### Direct API Option
+- [ ] Native Gemini API integration
+- [ ] Fallback mechanism
+- [ ] Performance comparison
 
+## Testing & Reliability
 
+### Subprocess Reliability
+- [ ] Test with slow/hanging processes
+- [ ] Verify memory cleanup
+- [ ] Test concurrent operations
+- [ ] Handle zombie processes
 
+### Gemini-Specific Errors
+- [ ] Parse Gemini error formats
+- [ ] Handle rate limits gracefully
+- [ ] Context length errors
+- [ ] Authentication failures
+- [ ] Model not found errors
 
+### Installation Robustness
+- [ ] Verify npm/bun availability
+- [ ] Handle partial installs
+- [ ] Support proxy environments
+- [ ] Offline install options
+- [ ] Version compatibility checks
 
-### Core Architecture - ✅ COMPLETED
+## Transport Layer Improvements
 
+### Async Operations
+- [ ] Proper cleanup on cancellation
+- [ ] Handle process groups
+- [ ] Stream buffering optimization
+- [ ] Backpressure handling
+- [ ] Resource leak prevention
 
+### Performance
+- [ ] Profile subprocess overhead
+- [ ] Optimize JSON/text parsing
+- [ ] Reduce memory usage
+- [ ] Connection reuse
+- [ ] Response streaming
 
+## Gemini-Specific Features
 
+### Options Support
+- [ ] Validate all Gemini options
+- [ ] Handle max-context-length
+- [ ] Support auto-approve mode
+- [ ] Implement yes-mode properly
+- [ ] System prompt handling
 
+### Response Handling
+- [ ] Parse structured responses
+- [ ] Handle streaming correctly
+- [ ] Support different output formats
+- [ ] Error response parsing
+- [ ] Metadata extraction
 
-## High Priority - v1.1 Quality & Testing
+## Code Organization
 
-### Unit Testing (80%+ Coverage Target)
-- [ ] **Transport Tests**: Test subprocess management with mocked gemini-cli calls
-- [ ] **CLI Discovery Tests**: Test CLI path discovery across different environments
-- [ ] **Command Tests**: Test command construction and execution variations
-- [ ] **Output Parsing Tests**: Test JSON and text output parsing edge cases
-- [ ] **Install Tests**: Test auto-install logic with mocked npm/bun operations
+### Key Module Improvements
 
-### Error Handling & User Experience
-- [ ] **API Key Validation**: Improve missing API key error handling with actionable messages
-- [ ] **Async Cleanup**: Improve async cleanup in transport layer
-- [ ] **Timeout Handling**: Add proper timeout management for long-running queries
-- [ ] **Subprocess Robustness**: Better subprocess error handling and cleanup
-- [ ] **Specific Exceptions**: Add more specific exception types for different failure modes
+#### transport.py
+- [ ] Better process lifecycle management
+- [ ] Improved CLI discovery logic
+- [ ] Enhanced error context
+- [ ] Performance monitoring
 
-### Documentation & Guides
-- [ ] **API Documentation**: Complete documentation for all public APIs
-- [ ] **Troubleshooting Guide**: Common issues and solutions
-- [ ] **Getting Started**: Comprehensive setup and usage guide
-- [ ] **CLI Examples**: Document all CLI commands with real examples
-- [ ] **Integration Guide**: How to integrate with main claif package
+#### client.py
+- [ ] Message validation
+- [ ] Error wrapping
+- [ ] Connection pooling
+- [ ] Retry logic
 
-## Medium Priority - Release & Polish
+#### cli.py
+- [ ] Standardized help text
+- [ ] Progress indicators
+- [ ] Better error display
+- [ ] Command shortcuts
 
-### CLI Standardization
-- [ ] **Version Flag**: Add `--version` flag for CLI
-- [ ] **Help Consistency**: Standardize `--help` output format
-- [ ] **Exit Codes**: Implement consistent exit code patterns
-- [ ] **Verbosity Levels**: Standardize logging levels and verbose output
+## Quality Standards
 
-### Build & Release Automation
-- [ ] **GitHub Actions**: Set up CI/CD pipeline with automated testing
-- [ ] **PyPI Publishing**: Set up automated PyPI release workflow
-- [ ] **Version Coordination**: Sync version bumps with main claif package
-- [ ] **Quality Gates**: Ensure all tests pass before releases
+### Testing Focus
+- [ ] Mock all anyio.open_process calls
+- [ ] Test CLI discovery paths
+- [ ] Verify command construction
+- [ ] Test JSON/text parsing
+- [ ] Validate error handling
 
-### Performance & Optimization
-- [ ] **Startup Time**: Optimize import time and CLI responsiveness
-- [ ] **Memory Usage**: Profile and optimize memory consumption
-- [ ] **Subprocess Efficiency**: Optimize gemini-cli communication
-- [ ] **Config Caching**: Cache configuration loading where beneficial
+### Performance Testing
+- [ ] Subprocess spawn overhead
+- [ ] Response parsing speed
+- [ ] Memory usage profiling
+- [ ] Concurrent operations
+- [ ] Large response handling
 
-## Low Priority - Future Enhancements
+## Success Metrics
 
-### Advanced Features (v1.2+)
-- [ ] Response caching with configurable TTL
-- [ ] Enhanced session management capabilities
-- [ ] Advanced retry logic with exponential backoff
-- [ ] Connection pooling for multiple queries
-- [ ] Direct Gemini API integration option
-- [ ] Image support for multimodal queries
+- [ ] **Reliability**: 99.9% success rate for subprocess operations
+- [ ] **Performance**: < 100ms overhead per operation
+- [ ] **Testing**: 80%+ test coverage with mocks
+- [ ] **Error Handling**: Clear, actionable error messages
+- [ ] **Cross-Platform**: Verified on Windows, macOS, Linux
+- [ ] **Documentation**: Complete user and API docs
+- [ ] **Installation**: Auto-install works everywhere
 
-### Development Experience
-- [ ] Enhanced debugging and profiling tools
-- [ ] Performance benchmarking suite
-- [ ] Advanced configuration options
-- [ ] Plugin system for custom extensions
+## Non-Goals for v1.x
 
-## Technical Debt
-
-### Code Quality Improvements
-- [ ] Improve error messages with actionable suggestions
-- [ ] Add more specific exception types
-- [ ] Consider using pathlib throughout instead of string paths
-- [ ] Enhance type hints and documentation
-
-### Known Issues
-- [ ] No validation for gemini-cli responses
-- [ ] Subprocess error handling could be more robust
-- [ ] Image support not yet implemented
-
-## Definition of Done for v1.1
-
-### Quality Gates
-- [ ] 80%+ unit test coverage on core modules
-- [ ] All linting (ruff) and type checking (mypy) passes
-- [ ] Cross-platform testing completed and documented
-- [ ] All CLI commands have `--help` and `--version`
-- [ ] Package builds successfully with `python -m build`
-- [ ] Auto-install functionality verified on clean systems
-
-### Success Criteria
-1. **Reliability**: No regressions from v1.0 functionality ✅
-2. **Testing**: Comprehensive test coverage gives confidence in changes
-3. **Documentation**: Users can easily understand and troubleshoot issues
-4. **Quality**: Professional polish suitable for production use
-5. **Automation**: Releases can be made confidently with automated testing
-
-## Current Focus
-
-**Immediate Next Steps:**
-1. Set up comprehensive unit test framework
-2. Create GitHub Actions CI/CD workflow
-3. Add missing error handling and validation
-4. Complete API documentation
-5. Verify cross-platform testing
-
-**Success Metrics Maintained:**
-- Keep < 100ms overhead per query
-- Maintain simple, clean architecture
-- Ensure zero-setup user experience
-- Preserve cross-platform compatibility
-
-The MVP is complete and working. Now we make it bulletproof with testing, documentation, and professional release automation.
+- Complex UI features
+- Custom protocol extensions
+- Database persistence
+- Multi-user support
+- Response transformation

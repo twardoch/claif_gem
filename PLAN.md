@@ -1,126 +1,238 @@
-# claif_gem Development Plan - Production Ready
+# claif_gem Development Plan - v1.x Stable MVP
 
-## Project Vision
+## Overview
 
-`claif_gem` is a production-ready wrapper around Google's Gemini CLI that integrates seamlessly with the Claif ecosystem. **MVP v1.0 is complete** - the package works reliably with auto-install functionality across all platforms.
+`claif_gem` is the Gemini provider for Claif, wrapping Google's Gemini CLI tool. The goal for v1.x is to create a stable, reliable MVP with comprehensive testing, cross-platform compatibility, and excellent subprocess management.
 
-## Current Status ✅
+## Current Status (v1.0.6)
 
-### MVP Requirements ACHIEVED
-1. **Gemini CLI Integration** ✅
-   - Robust subprocess wrapper for gemini-cli working
-   - Cross-platform CLI discovery and execution implemented
-   - Async message streaming with proper error handling
-   - Loguru-based logging (no rich dependencies)
+**Core Functionality**: Working Gemini CLI integration ✅
+**Auto-Install**: Automatic CLI installation when missing ✅
+**Subprocess Management**: Async with anyio ✅
+**CLI Interface**: Fire-based with clean output ✅
 
-2. **Auto-Install Support (Issue #201)** ✅
-   - Detects missing gemini-cli installation
-   - Auto-installs via npm when missing
-   - Integrated with bun bundling for offline scenarios
-   - Clear user guidance during installation process
+## MVP v1.x Improvement Plan
 
-3. **Streamlined CLI Interface** ✅
-   - Fire-based CLI with simple, clean output
-   - Essential commands working: ask, stream, health, models
-   - Version information and comprehensive help
-   - Proper error handling with actionable messages
+### 1. Testing & Reliability (Critical)
 
-4. **Cross-Platform Reliability** ✅
-   - Works seamlessly on Windows, macOS, Linux
-   - Handles different Node.js installation paths
-   - Robust subprocess management with timeouts
-   - Platform-specific path discovery
+#### Unit Testing
+- [ ] Add pytest test suite for all modules
+  - [ ] Test transport.py subprocess handling
+  - [ ] Test client.py message conversion
+  - [ ] Test CLI discovery logic
+  - [ ] Test command construction
+  - [ ] Test install.py functionality
+- [ ] Mock subprocess operations
+- [ ] Test timeout and cancellation
+- [ ] Achieve 80%+ code coverage
 
-## Architecture Status ✅
+#### Integration Testing  
+- [ ] Test with real Gemini CLI
+- [ ] Test auto-install flow
+- [ ] Test different response formats
+- [ ] Test error conditions
+- [ ] Cross-platform compatibility
 
+#### Subprocess Reliability
+- [ ] Handle process termination cleanly
+- [ ] Test with slow/hanging processes
+- [ ] Verify memory cleanup
+- [ ] Test concurrent operations
+- [ ] Handle zombie processes
+
+### 2. Error Handling & Messages
+
+#### Better Error Context
+- [ ] Add context to subprocess errors
+- [ ] Clear API key error messages
+- [ ] Installation failure guidance
+- [ ] Network timeout explanations
+- [ ] Model availability errors
+
+#### Gemini-Specific Errors
+- [ ] Parse Gemini error formats
+- [ ] Handle rate limits gracefully
+- [ ] Context length errors
+- [ ] Authentication failures
+- [ ] Model not found errors
+
+### 3. CLI Discovery & Platform Support
+
+#### Cross-Platform Discovery
+- [ ] Test all discovery paths
+- [ ] Handle Windows .cmd files
+- [ ] Support custom install paths
+- [ ] Verify executable permissions
+- [ ] Handle path spaces correctly
+
+#### Platform-Specific Testing
+- [ ] Windows path handling
+- [ ] macOS security permissions
+- [ ] Linux distribution variations
+- [ ] WSL compatibility
+- [ ] Docker container support
+
+### 4. Transport Layer Improvements
+
+#### Async Operations
+- [ ] Proper cleanup on cancellation
+- [ ] Handle process groups
+- [ ] Stream buffering optimization
+- [ ] Backpressure handling
+- [ ] Resource leak prevention
+
+#### Performance
+- [ ] Profile subprocess overhead
+- [ ] Optimize JSON/text parsing
+- [ ] Reduce memory usage
+- [ ] Connection reuse
+- [ ] Response streaming
+
+### 5. Gemini-Specific Features
+
+#### Options Support
+- [ ] Validate all Gemini options
+- [ ] Handle max-context-length
+- [ ] Support auto-approve mode
+- [ ] Implement yes-mode properly
+- [ ] System prompt handling
+
+#### Response Handling
+- [ ] Parse structured responses
+- [ ] Handle streaming correctly
+- [ ] Support different output formats
+- [ ] Error response parsing
+- [ ] Metadata extraction
+
+### 6. Documentation & Examples
+
+#### User Documentation
+- [ ] Installation guide
+- [ ] API key setup guide
+- [ ] Model selection guide
+- [ ] Auto-approve usage
+- [ ] Troubleshooting section
+
+#### Developer Documentation
+- [ ] Architecture overview
+- [ ] Transport design patterns
+- [ ] Testing approach
+- [ ] Contributing guide
+- [ ] Performance tips
+
+## Architecture Improvements
+
+### Module Structure
 ```
 claif_gem/
-├── transport.py   # Subprocess management & CLI discovery ✅
-├── client.py      # Claif provider interface ✅
-├── cli.py         # Fire-based CLI (loguru only) ✅
-├── types.py       # Type definitions ✅
-└── install.py     # Auto-install functionality ✅
+├── __init__.py        # Clean public API
+├── transport.py       # Robust subprocess layer
+├── client.py         # Tested client wrapper
+├── cli.py            # User-friendly CLI
+├── types.py          # Well-defined types
+├── install.py        # Cross-platform installer
+└── utils.py          # Shared utilities
 ```
 
-## Quality Roadmap (v1.1+)
+### Key Improvements Needed
 
-### Phase 1: Testing & Reliability
-- [ ] **Unit Tests**: Comprehensive unit test coverage (80%+ target)
-- [ ] **Mock Testing**: Mock subprocess calls for reliable testing
-- [ ] **Cross-Platform Tests**: Automated testing on Windows, macOS, Linux
-- [ ] **Error Handling**: Improve edge case handling and subprocess error messages
+#### transport.py
+- Better process lifecycle management
+- Improved CLI discovery logic
+- Enhanced error context
+- Performance monitoring
 
-### Phase 2: User Experience Polish
-- [ ] **CLI Improvements**: Standardize `--version`, `--help` across commands
-- [ ] **Error Messages**: Make errors actionable with clear next steps
-- [ ] **Performance**: Optimize startup time and reduce overhead
-- [ ] **Documentation**: Complete API docs and troubleshooting guides
+#### client.py
+- Message validation
+- Error wrapping
+- Connection pooling
+- Retry logic
 
-### Phase 3: Release Automation
-- [ ] **GitHub Actions**: Set up CI/CD pipelines
-- [ ] **PyPI Publishing**: Automated release workflows
-- [ ] **Version Management**: Coordinate with main claif package versions
-- [ ] **Quality Gates**: Ensure all tests pass before releases
+#### cli.py
+- Standardized help text
+- Progress indicators
+- Better error display
+- Command shortcuts
 
-## Technical Debt & Improvements
+## Quality Standards
 
 ### Code Quality
-- [ ] Improve API key validation with better error messages
-- [ ] Add async cleanup improvements in transport layer
-- [ ] Enhance timeout handling for long-running queries
-- [ ] Add more specific exception types for different failure modes
+- 100% type hint coverage
+- Comprehensive docstrings
+- Maximum cyclomatic complexity: 10
+- Clear error messages
+- Consistent naming
 
-### Testing Priorities
-- [ ] Transport layer tests with subprocess mocking
-- [ ] CLI discovery logic tests with various environments
-- [ ] Command construction and output parsing tests
-- [ ] Auto-install tests with mocked npm/bun operations
-- [ ] JSON/text edge case parsing tests
+### Testing Standards
+- Unit tests for all functions
+- Integration tests for workflows
+- Mock all subprocess calls
+- Test all error paths
+- Cross-platform verification
 
-## Success Metrics ACHIEVED ✅
+### Documentation Standards
+- Complete README
+- API documentation
+- Architecture diagrams
+- Troubleshooting guide
+- Platform-specific notes
 
-1. **Usability**: Works with `uvx claif_gem` immediately ✅
-2. **Reliability**: Handles missing dependencies gracefully ✅
-3. **Performance**: < 100ms overhead per query ✅
-4. **Cross-platform**: Tested on Windows, macOS, Linux ✅
-5. **Maintainability**: Clean, well-tested codebase ✅
+## Success Criteria for v1.x
 
-## Future Enhancements (v1.2+)
+1. **Reliability**: 99.9% success rate for subprocess operations
+2. **Performance**: < 100ms overhead per operation
+3. **Testing**: 80%+ test coverage with mocks
+4. **Error Handling**: Clear, actionable error messages
+5. **Cross-Platform**: Verified on Windows, macOS, Linux
+6. **Documentation**: Complete user and API docs
+7. **Installation**: Auto-install works everywhere
 
-### Advanced Features (Post-MVP)
-- Response caching for improved performance
-- Enhanced session management capabilities
-- Advanced retry logic with exponential backoff
-- Connection pooling for multiple queries
-- Direct Gemini API integration option
+## Development Priorities
 
-### Non-Goals Maintained
-- Complex UI/formatting features (keep it simple)
-- Advanced configuration management beyond basics
-- Performance optimizations beyond reasonable needs
-- Extensive plugin systems
-- Web interfaces
+### Immediate (v1.0.7)
+1. Add comprehensive test suite
+2. Fix subprocess cleanup issues
+3. Improve error messages
 
-## Release Strategy
+### Short-term (v1.1.0)
+1. Cross-platform testing
+2. Complete documentation
+3. Performance optimization
 
-- **v1.0**: ✅ Production MVP with auto-install and no rich deps (COMPLETE)
-- **v1.1**: Quality improvements, testing, documentation
-- **v1.2**: Enhanced features based on user feedback
+### Medium-term (v1.2.0)
+1. Advanced Gemini features
+2. Response caching
+3. Direct API option
 
-## Current Priorities
+## Non-Goals for v1.x
 
-**Immediate Focus for v1.1:**
-1. Add comprehensive unit test coverage
-2. Set up GitHub Actions CI/CD
-3. Complete documentation and troubleshooting guides
-4. Verify and document cross-platform compatibility
-5. Prepare for professional PyPI release
+- Complex UI features
+- Custom protocol extensions
+- Database persistence
+- Multi-user support
+- Response transformation
 
-**Quality Gates for v1.1:**
-- 80%+ unit test coverage on core modules
-- All linting and type checking passes
-- Cross-platform testing completed
-- Documentation complete and accurate
-- Auto-install functionality verified on clean systems
+## Testing Strategy
 
-The foundation is solid and working reliably. Now we focus on quality, testing, and professional polish for confident v1.1 release.
+### Unit Test Focus
+- Mock all anyio.open_process calls
+- Test CLI discovery paths
+- Verify command construction
+- Test JSON/text parsing
+- Validate error handling
+
+### Integration Test Focus
+- Real CLI execution
+- Cross-platform paths
+- Installation verification
+- Network failure scenarios
+- Model selection
+
+### Performance Testing
+- Subprocess spawn overhead
+- Response parsing speed
+- Memory usage profiling
+- Concurrent operations
+- Large response handling
+
+Keep the codebase lean and focused on being a reliable Gemini provider for Claif.
