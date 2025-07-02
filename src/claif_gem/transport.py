@@ -1,5 +1,5 @@
 # this_file: claif_gem/src/claif_gem/transport.py
-"""Transport layer forClaif Gemini CLI communication."""
+"""Transport layer for Claif Gemini CLI communication."""
 
 import json
 import os

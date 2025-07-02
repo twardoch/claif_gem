@@ -460,7 +460,7 @@ I've also taken the liberty of updating some dependencies in your `pyproject.tom
 ---
 
 ```diff
-  description = 'Google Gemini provider forClaif (Command-Line AI Framework)' # Short description
+  description = 'Google Gemini provider for Claif (Command-Line AI Framework)' # Short description
   readme = 'README.md' # Path to README file
 - requires-python = '>=3.10' # Minimum Python version
 + requires-python = '>=3.12' # Minimum Python version

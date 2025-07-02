@@ -8,9 +8,9 @@ The project consists of four Github repositories and Python packages:
 - [`claif_cla`](https://github.com/twardoch/claif_cla/): CLI and Python package that wraps the [`claude_code_sdk`](https://github.com/anthropics/claude-code-sdk-python) package for interacting with Anthropic’s [Claude Code CLI](https://github.com/anthropics/claude-code) agentic CLI toolkit based on their Claude models.
 - [`claif_cod`](https://github.com/twardoch/claif_cod/): CLI and Python package for interacting with OpenAI’s new [Codex CLI](https://github.com/openai/codex) agentic CLI toolkit based on OpenAI’s models.
 - [`claif_gem`](https://github.com/twardoch/claif_gem/): CLI and Python package for that wraps the [Gemini CLI](https://github.com/google-gemini/gemini-cli/) agentic CLI toolkit based on Google’s Gemini models.
-- [`claif`](https://github.com/twardoch/claif/): The top-levelClaif framework that provides the main building blocks, including the client, server, and provider integrations.
+- [`claif`](https://github.com/twardoch/claif/): The top-level Claif framework that provides the main building blocks, including the client, server, and provider integrations.
 
-This document provides comprehensive development guidelines for all packages in theClaif ecosystem.
+This document provides comprehensive development guidelines for all packages in the Claif ecosystem.
 
 ## 1. This very project overview
 
@@ -32,11 +32,11 @@ This document provides comprehensive development guidelines for all packages in 
 - Timeout and error recovery
 - Cross-platform compatibility
 
-## 2. Other projects in theClaif ecosystem
+## 2. Other projects in the Claif ecosystem
 
 ### 2.1. `claif`:Claif core framework
 
-[`claif`](https://github.com/twardoch/claif/) is the top-levelClaif framework that provides the main building blocks, including the client, server, and provider integrations.
+[`claif`](https://github.com/twardoch/claif/) is the top-level Claif framework that provides the main building blocks, including the client, server, and provider integrations.
 
 **Key Responsibilities:**
 
@@ -91,11 +91,11 @@ This document provides comprehensive development guidelines for all packages in 
 - Project context awareness
 - Action mode refinement
 
-## 3. Working Principles forClaif Development
+## 3. Working Principles for Claif Development
 
 ### 3.1. Core Development Principles
 
-When developing forClaif (in any sub-project):
+When developing for Claif (in any sub-project):
 
 - **Iterate gradually**, avoiding major breaking changes to the plugin interface
 - **Minimize user confirmations** while maintaining safety, especially for code operations
@@ -134,12 +134,12 @@ In each source file, maintain the `this_file` record:
 
 ```python
 # this_file: src/claif_cla/cli.py
-"""CLI interface for theClaif Claude provider"""
+"""CLI interface for the Claif Claude provider"""
 ```
 
 ### 3.4. Python-Specific Guidelines
 
-For allClaif Python code:
+For all Claif Python code:
 
 - **PEP 8**: Consistent formatting with 120-char line limit (per pyproject.toml)
 - **Descriptive names**: `query_with_retry()` not `qwr()`
@@ -226,7 +226,7 @@ Each sub-project must maintain:
 
 ## 6. Virtual Team Collaboration
 
-When developingClaif:
+When developing Claif:
 
 **Be creative, diligent, critical, relentless & funny!**
 
@@ -246,7 +246,7 @@ If compatibility issues arise, step back and focus on the unified interface goal
 
 ## 7. Release Coordination
 
-SinceClaif uses a monorepo structure:
+Since Claif uses a monorepo structure:
 
 1. Version all packages together
 2. Update inter-package dependencies
@@ -256,7 +256,7 @@ SinceClaif uses a monorepo structure:
 
 ## 8. Final Checkpoint
 
-When completing anyClaif development:
+When completing any Claif development:
 
 **"Wait, but..."** - Review your changes:
 

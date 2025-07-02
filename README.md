@@ -1,4 +1,4 @@
-#`claif_gem` - Google Gemini Provider forClaif
+#`claif_gem` - Google Gemini Provider for Claif
 
 ## Quickstart
 
@@ -8,7 +8,7 @@ Claif_GEM provides a Python interface and CLI wrapper for Google's Gemini AI mod
 pip install claif_gem && claif-gem query "Explain quantum computing in one sentence"
 ```
 
-Claif_GEM is the Google Gemini provider implementation for the Claif (Command-Line Artificial Intelligence Framework). It wraps the [Gemini CLI](https://github.com/google-gemini/gemini-cli/) to integrate Google's Gemini AI models into the unifiedClaif ecosystem.
+Claif_GEM is the Google Gemini provider implementation for the Claif (Command-Line Artificial Intelligence Framework). It wraps the [Gemini CLI](https://github.com/google-gemini/gemini-cli/) to integrate Google's Gemini AI models into the unified Claif ecosystem.
 
 ## What is`claif_gem`?
 
@@ -49,9 +49,9 @@ cd claif_gem
 pip install -e .
 ```
 
-### WithClaif Framework
+### With Claif Framework
 ```bash
-# InstallClaif with all providers
+# Install Claif with all providers
 pip install claif[all]
 
 # Or just with Gemini support
@@ -199,7 +199,7 @@ asyncio.run(main())
 
 #### 1. **Main Module** (`__init__.py`)
 - Provides the `query()` function as the main entry point
-- ConvertsClaif's `ClaifOptions` to `GeminiOptions`
+- Converts Claif's `ClaifOptions` to `GeminiOptions`
 - Delegates to the client module for execution
 - Exports public API: `query` and `GeminiOptions`
 
@@ -213,7 +213,7 @@ asyncio.run(main())
 #### 3. **Client Module** (`client.py`)
 - `GeminiClient` class manages the query lifecycle
 - Coordinates with transport layer
-- Converts Gemini messages toClaif message format
+- Converts Gemini messages to Claif message format
 - Module-level `_client` instance for convenience
 
 #### 4. **Transport Module** (`transport.py`)
@@ -228,7 +228,7 @@ asyncio.run(main())
 - `GeminiOptions`: Configuration dataclass
 - `GeminiMessage`: Response message type
 - `ResultMessage`: Metadata and error information
-- Type conversion methods toClaif formats
+- Type conversion methods to Claif formats
 
 ### Message Flow
 
@@ -284,7 +284,7 @@ gemini \
 
 ## Why Use`claif_gem`?
 
-1. **Unified Interface**: Access Gemini through the standardClaif API
+1. **Unified Interface**: Access Gemini through the standard Claif API
 2. **Cross-Platform**: Automatic CLI discovery works on Windows, macOS, Linux
 3. **Async First**: Built on anyio for efficient concurrent operations
 4. **Rich CLI**: Fire-based interface with progress indicators and formatting

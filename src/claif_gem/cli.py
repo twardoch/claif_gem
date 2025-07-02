@@ -7,8 +7,6 @@ import sys
 import time
 
 import fire
-from loguru import logger
-
 from claif.common import (
     Provider,
     ResponseMetrics,
@@ -16,6 +14,8 @@ from claif.common import (
     format_response,
     load_config,
 )
+from loguru import logger
+
 from claif_gem.client import query
 from claif_gem.types import GeminiOptions
 

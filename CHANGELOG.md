@@ -82,12 +82,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated README.md with comprehensive documentation
 - Enhanced pyproject.toml with complete metadata and dependencies
 - Improved code organization and type hints
-- Added compatibility layer for standalone usage withoutClaif core
+- Added compatibility layer for standalone usage without Claif core
 
 ## [1.0.0] - 2025-01-02
 
 ### Added
-- Initial release of`claif_gem` - Google Gemini provider forClaif
+- Initial release of`claif_gem` - Google Gemini provider for Claif
 - Fire-based CLI with commands: `query`, `stream`, `health`, `models`, `config`
 - Async/await support for all operations
 - Subprocess-based integration with Gemini CLI binary
@@ -98,19 +98,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Type hints for better IDE support
 - Environment variable configuration support
 - Module structure with clear separation of concerns:
-  - `__init__.py`: Main entry point andClaif interface
+  - `__init__.py`: Main entry point and Claif interface
   - `cli.py`: Fire-based command-line interface
   - `client.py`: Client orchestration layer
   - `transport.py`: Subprocess management and CLI communication
   - `types.py`: Type definitions and data classes
 - Comprehensive documentation:
-  - CLAUDE.md: Development guidelines forClaif ecosystem
+  - CLAUDE.md: Development guidelines for Claif ecosystem
   - GEMINI.md: Gemini-specific development notes
   - AGENTS.md: Virtual team collaboration guide
 - Reference materials for Gemini CLI integration
 
 ### Dependencies
-- `claif>=1.0.1`: CoreClaif framework
+- `claif>=1.0.1`: Core Claif framework
 - `anyio>=4.0.0`: Async I/O library for subprocess management
 - `fire>=0.5.0`: CLI framework
 - `rich>=13.0.0`: Terminal formatting and progress display

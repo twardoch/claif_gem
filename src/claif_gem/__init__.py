@@ -22,11 +22,11 @@ async def query(
     prompt: str,
     options: ClaifOptions | None = None,
 ) -> AsyncIterator[Message]:
-    """Query Gemini usingClaif interface.
+    """Query Gemini using Claif interface.
 
     Args:
         prompt: The prompt to send to Gemini
-        options: OptionalClaif options
+        options: Optional Claif options
 
     Yields:
         Messages from Gemini
@@ -34,7 +34,7 @@ async def query(
     if options is None:
         options = ClaifOptions()
 
-    # ConvertClaif options to Gemini options
+    # Convert Claif options to Gemini options
     gemini_options = GeminiOptions(
         model=options.model,
         temperature=options.temperature,

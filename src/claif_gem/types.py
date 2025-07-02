@@ -1,5 +1,5 @@
 # this_file: src/claif_gem/types.py
-"""Type definitions forClaif Gemini wrapper."""
+"""Type definitions for Claif Gemini wrapper."""
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -36,7 +36,7 @@ class GeminiMessage:
     role: str = "assistant"
 
     def to_claif_message(self) -> Message:
-        """Convert toClaif message."""
+        """Convert to Claif message."""
         return Message(
             role=MessageRole.ASSISTANT,
             content=self.content,
@@ -54,7 +54,7 @@ class GeminiResponse:
     raw_response: dict[str, Any] | None = None
 
     def to_claif_message(self) -> Message:
-        """Convert toClaif message."""
+        """Convert to Claif message."""
         role = MessageRole.ASSISTANT if self.role == "assistant" else MessageRole.USER
         return Message(role=role, content=self.content)
 
