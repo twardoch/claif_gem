@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2025-01-02
+
+### Added
+- **Smart Retry Logic**: Implemented tenacity-based retry mechanism for transient errors
+  - Added `retry_delay` field to `GeminiOptions` for configurable retry delays
+  - Added `no_retry` field to `GeminiOptions` to disable retries
+  - Added --no_retry CLI flag support in all commands
+  - Comprehensive error detection for quota/rate limit errors
+  - Exponential backoff with configurable multipliers
+  - Created test suite `test_retry_logic.py` with 5 test scenarios
+
+### Changed
+- Enhanced `transport.py` to handle quota exhaustion errors intelligently
+- Updated error detection to include: "quota", "exhausted", "rate limit", "429", "503", "502"
+- Modified `send_query` to check no_retry flag before attempting retries
+- Improved error messages to indicate retry count on failure
+
+### Fixed
+- Fixed issue where quota errors would fail immediately instead of retrying
+- Ensured non-retryable errors (like invalid API key) fail fast
+
 ## [1.0.6] - 2025-07-02
 
 ### Added

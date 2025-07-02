@@ -4,12 +4,15 @@
 
 `claif_gem` is the Gemini provider for Claif, wrapping Google's Gemini CLI tool. The goal for v1.x is to create a stable, reliable MVP with comprehensive testing, cross-platform compatibility, and excellent subprocess management.
 
-## Current Status (v1.0.6)
+## Current Status (v1.0.7-dev)
 
 **Core Functionality**: Working Gemini CLI integration ✅
 **Auto-Install**: Automatic CLI installation when missing ✅
 **Subprocess Management**: Async with anyio ✅
 **CLI Interface**: Fire-based with clean output ✅
+**Retry Logic**: Tenacity-based retry with exponential backoff ✅
+**Error Detection**: Smart detection of quota/rate limit errors ✅
+**Testing**: Comprehensive retry logic test suite ✅
 
 ## MVP v1.x Improvement Plan
 
