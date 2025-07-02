@@ -1,5 +1,5 @@
 
-#Claif (Command-Line Artificial Intelligence Framework)
+# Claif (Command-Line Artificial Intelligence Framework)
 
 Claif (Command-Line AI Framework) is a unified interface for interacting with various large language models (LLMs) from the command line.
 
