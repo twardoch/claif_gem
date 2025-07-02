@@ -1,5 +1,5 @@
 # this_file: src/claif_gem/__init__.py
-"""CLAIF Gemini wrapper."""
+"""Claif Gemini wrapper."""
 
 from collections.abc import AsyncIterator
 

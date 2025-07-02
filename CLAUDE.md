@@ -1,7 +1,7 @@
 
 #Claif (Command-Line Artificial Intelligence Framework)
 
-CLAIF (Command-Line AI Framework) is a unified interface for interacting with various large language models (LLMs) from the command line.
+Claif (Command-Line AI Framework) is a unified interface for interacting with various large language models (LLMs) from the command line.
 
 The project consists of four Github repositories and Python packages:
 
@@ -10,7 +10,7 @@ The project consists of four Github repositories and Python packages:
 - [`claif_gem`](https://github.com/twardoch/claif_gem/): CLI and Python package for that wraps the [Gemini CLI](https://github.com/google-gemini/gemini-cli/) agentic CLI toolkit based on Google’s Gemini models.
 - [`claif`](https://github.com/twardoch/claif/): The top-levelClaif framework that provides the main building blocks, including the client, server, and provider integrations.
 
-This document provides comprehensive development guidelines for all packages in theClaif ecosystem.
+This document provides comprehensive development guidelines for all packages in the Claif ecosystem.
 
 ## 1. This very project overview
 
@@ -32,7 +32,7 @@ This document provides comprehensive development guidelines for all packages in 
 - Timeout and error recovery
 - Cross-platform compatibility
 
-## 2. Other projects in theClaif ecosystem
+## 2. Other projects in the Claif ecosystem
 
 ### 2.1. `claif`:Claif core framework
 
@@ -134,7 +134,7 @@ In each source file, maintain the `this_file` record:
 
 ```python
 # this_file: src/claif_cla/cli.py
-"""CLI interface for theClaif Claude provider"""
+"""CLI interface for the Claif Claude provider"""
 ```
 
 ### 3.4. Python-Specific Guidelines

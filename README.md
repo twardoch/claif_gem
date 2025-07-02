@@ -2,17 +2,17 @@
 
 ## Quickstart
 
-CLAIF_GEM provides a Python interface and CLI wrapper for Google's Gemini AI models. It integrates the Gemini CLI tool into theClaif framework, enabling you to query Gemini models with a simple command or Python API call. Version 1.0.4 improves subprocess reliability by switching to native asyncio.
+Claif_GEM provides a Python interface and CLI wrapper for Google's Gemini AI models. It integrates the Gemini CLI tool into the Claif framework, enabling you to query Gemini models with a simple command or Python API call. Version 1.0.4 improves subprocess reliability by switching to native asyncio.
 
 ```bash
 pip install claif_gem && claif-gem query "Explain quantum computing in one sentence"
 ```
 
-CLAIF_GEM is the Google Gemini provider implementation for theClaif (Command-Line Artificial Intelligence Framework). It wraps the [Gemini CLI](https://github.com/google-gemini/gemini-cli/) to integrate Google's Gemini AI models into the unifiedClaif ecosystem.
+Claif_GEM is the Google Gemini provider implementation for the Claif (Command-Line Artificial Intelligence Framework). It wraps the [Gemini CLI](https://github.com/google-gemini/gemini-cli/) to integrate Google's Gemini AI models into the unifiedClaif ecosystem.
 
 ## What is`claif_gem`?
 
-CLAIF_GEM provides a Python interface and command-line wrapper for the Google Gemini CLI tool. It enables seamless integration of Google's Gemini language models with theClaif framework through subprocess management and message translation.
+Claif_GEM provides a Python interface and command-line wrapper for the Google Gemini CLI tool. It enables seamless integration of Google's Gemini language models with the Claif framework through subprocess management and message translation.
 
 Key features:
 - **Subprocess-based integration** with the Gemini CLI binary
@@ -60,7 +60,7 @@ pip install claif claif_gem
 
 ## CLI Usage
 
-CLAIF_GEM provides a Fire-based CLI for direct interaction with Gemini:
+Claif_GEM provides a Fire-based CLI for direct interaction with Gemini:
 
 ### Basic Commands
 
@@ -280,7 +280,7 @@ gemini \
 
 - `GEMINI_CLI_PATH`: Path to Gemini CLI binary
 - `GEMINI_SDK=1`: Set by transport to indicate SDK usage
-- `CLAIF_PROVIDER=gemini`: Provider identification
+- `Claif_PROVIDER=gemini`: Provider identification
 
 ## Why Use`claif_gem`?
 
@@ -342,6 +342,6 @@ MIT License - see LICENSE file for details.
 
 - [GitHub Repository](https://github.com/twardoch/claif_gem)
 - [PyPI Package](https://pypi.org/project/claif_gem/)
-- [CLAIF Framework](https://github.com/twardoch/claif)
+- [Claif Framework](https://github.com/twardoch/claif)
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli/)
 - [Google AI Documentation](https://ai.google.dev/)

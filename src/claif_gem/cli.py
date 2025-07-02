@@ -37,7 +37,7 @@ def _print_warning(message: str) -> None:
 
 
 class GeminiCLI:
-    """CLAIF Gemini CLI with Fire interface."""
+    """Claif Gemini CLI with Fire interface."""
 
     def __init__(self, config_file: str | None = None, verbose: bool = False):
         """Initialize CLI with optional config file."""

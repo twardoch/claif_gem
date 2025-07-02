@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2025-07-02
+
+### Added
+- **Auto-Install Exception Handling**: Added automatic CLI detection and installation when gemini-cli tools are missing
+- Added `_is_cli_missing_error()` function to detect missing CLI tool errors
+- Added automatic retry logic after successful installation
+- Added post-install configuration prompts with terminal opening utilities
+
+### Changed
+- **Rich Dependencies Removed**: Completely removed all rich library dependencies
+- Replaced rich.console with simple print functions and loguru logging
+- Simplified CLI output using `_print`, `_print_error`, `_print_success`, `_print_warning` helper functions
+- Streamlined installation process integration with main claif client
+
+### Fixed
+- **Removed Compatibility Layer**: Completely removed `_compat` directory and all compatibility imports
+- Updated all imports to use `claif.common` directly instead of fallback compatibility layer
+- Fixed naming conflict by renaming `config` attribute to `_config` in CLI class
+- Resolved import issues across all modules (types.py, __init__.py, client.py, cli.py)
+
+### Removed
+- Removed all rich imports (rich.console, rich.progress, rich.table, rich.live, rich.syntax)
+- Removed `_compat` directory and compatibility layer completely
+- Removed complex UI formatting in favor of simple, clean output
+
+## [1.0.5] - 2025-07-02
+
+### Changed
+- Enhanced auto-install functionality with better error detection
+- Improved integration with claif core install system
+
 ## [1.0.4] - 2025-07-01
 
 ### Changed
