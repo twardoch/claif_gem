@@ -1,97 +1,99 @@
-# TODO for CLAIF_GEM
+# claif_gem TODO List
 
-## v1.0 Released ✅
+## Essential MVP Tasks
 
-### Completed for v1.0 (2025-01-02)
-- ✅ Fix imports to work without local claif package
-  - ✅ Make claif import optional with try/except
-  - ✅ Provide fallback types if claif not available (created _compat module)
-  - ✅ Update pyproject.toml to handle missing claif gracefully
-  
-- ✅ Update logging to use loguru
-  - ✅ Replace all get_logger() calls with direct loguru import
-  - ✅ Simple logger.debug(), logger.error(), logger.warning() calls
+### Core Functionality
+- [ ] Add proper error handling for missing API keys  
+- [ ] Implement async cleanup in transport layer
+- [ ] Add timeout handling for long-running queries
+- [ ] Improve gemini-cli subprocess communication
 
-- ✅ Core functionality
-  - ✅ Subprocess-based Gemini CLI integration
-  - ✅ Cross-platform CLI discovery
-  - ✅ Fire-based CLI with rich output
-  - ✅ Async support with anyio
-  - ✅ Error handling and timeouts
-  - ✅ Comprehensive documentation
+### Auto-Install Support (Issue #201) - ✅ COMPLETED
+- [x] Implement auto-install of gemini-cli when missing
+- [x] Add CLI detection and installation prompts  
+- [x] Integrate with bun bundling for offline installation
+- [x] Wire existing install commands as exception handlers
 
-## v1.1 - Next Release
+### Rich Dependencies - ✅ COMPLETED
+- [x] Remove all rich dependencies from CLI
+- [x] Replace rich.console with loguru logging
+- [x] Simplify progress indicators and output formatting
+- [x] Use plain text output with clear formatting
 
-### 🔴 High Priority
-- [ ] Add comprehensive test coverage
-  - [ ] Test CLI discovery logic with mocks
-  - [ ] Test command construction variations
-  - [ ] Test output parsing (JSON and text edge cases)
-  - [ ] Mock subprocess for reliable tests
-  - [ ] Integration tests with CLAIF core
-  
+### Testing
+- [ ] Create integration tests with mocked Gemini responses
+- [ ] Add unit tests for transport layer
+- [ ] Test CLI entry point installation
+- [ ] Add --version flag for CLI
+
+### Documentation
+- [ ] Add troubleshooting guide
+- [ ] Document all CLI commands with examples
+- [ ] Create getting started guide
+
+## Known Issues
+- [ ] No validation for gemini-cli responses
+- [ ] Subprocess error handling could be more robust
+- [ ] Image support not yet implemented
+
+## Technical Debt
+- [ ] Improve error messages with actionable suggestions
+- [ ] Add more specific exception types
+- [ ] Consider using pathlib throughout instead of string paths
+
+## Contributing Guidelines
+
+- [ ] Create CONTRIBUTING.md
+- [ ] Set up issue templates
+- [ ] Create PR template
+- [ ] Define code review process
+
+## Notes
+
+- Focus on stability and reliability for v1.x releases
+- Keep the wrapper thin and maintainable
+- Prioritize developer experience
+- Test thoroughly with real gemini-cli before each release
+
+### Core Testing
+- [ ] Add comprehensive test coverage (currently minimal)
+- [ ] Test CLI discovery logic with mocks
+- [ ] Test command construction variations
+- [ ] Test output parsing (JSON and text edge cases)
+- [ ] Mock subprocess for reliable tests
+- [ ] Integration tests withClaif core
+
+### Cross-Platform Reliability
 - [ ] Verify packaging and distribution
-  - [ ] Test `hatch build` on multiple platforms
-  - [ ] Test pip install from PyPI
-  - [ ] Verify CLI entry points on Windows
-  
-### 🟡 Medium Priority
-- [ ] Improve error messages
-  - [ ] Better guidance when Gemini CLI not found (suggest npm install)
-  - [ ] Clear subprocess failure reasons
-  - [ ] Helpful timeout messages with suggestions
-  
-- [ ] Platform-specific testing
-  - [ ] Verify Windows path discovery
-  - [ ] Test Linux package manager installs
-  - [ ] Document platform-specific setup
-  
-### 🟢 Low Priority
-- [ ] Add GitHub Actions workflow
-  - [ ] Basic CI/CD pipeline
-  - [ ] Run tests on Python 3.12+
-  - [ ] Automated release process
-  
-- [ ] Performance improvements
-  - [ ] Subprocess reuse for multiple queries
-  - [ ] Better SIGINT handling
-  - [ ] Optimize stderr capture
+- [ ] Test `hatch build` on multiple platforms
+- [ ] Test pip install from PyPI
+- [ ] Verify CLI entry points on Windows
+- [ ] Test Linux package manager installs
 
-## v2.0 - Future Major Release
+### Error Handling
+- [ ] Improve error messages for missing CLI
+- [ ] Better guidance when Gemini CLI not found
+- [ ] Clear subprocess failure reasons
+- [ ] Helpful timeout messages with suggestions
+
+## Technical Improvements
+
+### Code Quality
+- [ ] Platform-specific testing
+- [ ] Better SIGINT handling
+- [ ] Optimize stderr capture
+- [ ] Add GitHub Actions workflow
 
 ### Performance
-- Connection pooling
-- Response caching
-- Parallel query support
-- Subprocess reuse
+- [ ] Subprocess reuse for multiple queries (future)
+- [ ] Connection pooling (future)
+- [ ] Response caching (future)
 
-### Features
-- Direct Gemini API support
-- Session management
-- Tool approval handling
-- Advanced retry logic
-- Multi-model orchestration
-- Configuration file support
-
-### Developer Experience  
-- Plugin system
-- Custom transports
-- Advanced logging
-- Metrics collection
-- Debug mode
-
-## Quick Wins for v1.1
-
-1. Add pytest fixtures for subprocess mocking (1 hour)
-2. Create 5-10 unit tests covering core functionality (2 hours)
-3. Test on Windows VM or CI (1 hour)
-4. Improve error messages with actionable suggestions (30 min)
-
-## Definition of Done for v1.1
+## Definition of Done
 
 - [ ] 80%+ test coverage on core modules
 - [ ] All tests pass on Python 3.12+
 - [ ] Verified working on Windows, macOS, Linux
+- [x] No rich dependencies
+- [ ] Auto-install functionality working
 - [ ] Published to PyPI
-- [ ] GitHub Actions CI running
-- [ ] No regression from v1.0 features

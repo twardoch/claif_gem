@@ -1,20 +1,18 @@
 # this_file: claif_gem/src/claif_gem/transport.py
-"""Transport layer for CLAIF Gemini CLI communication."""
+"""Transport layer forClaif Gemini CLI communication."""
 
 import json
 import os
 import shlex
-import shutil
-import sys
 import uuid
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
 
 import anyio
+from claif.common import InstallError, TransportError, find_executable
 from loguru import logger
 
-from claif.common import InstallError, TransportError, find_executable
 from claif_gem.types import GeminiMessage, GeminiOptions, ResultMessage
 
 

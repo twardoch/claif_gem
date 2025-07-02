@@ -1,110 +1,137 @@
-# CLAIF_GEM Development Plan
+# claif_gem Development Plan - Production MVP
 
 ## Project Vision
 
-CLAIF_GEM is a minimal, focused provider implementation that wraps the Google Gemini CLI for use within the CLAIF ecosystem. The goal is to provide a simple, reliable interface between CLAIF and the Gemini CLI binary without overengineering.
+`claif_gem` is a production-ready wrapper around Google's Gemini CLI that integrates seamlessly with theClaif ecosystem. The focus is on delivering a stable, cross-platform tool that auto-installs dependencies and works reliably out of the box.
 
-## v1.0 - Minimal Viable Product (RELEASED)
+## MVP Requirements (v1.1)
 
-### Core Features (✅ All Implemented)
-- ✅ Basic subprocess wrapper for Gemini CLI
-- ✅ Automatic CLI discovery across platforms
-- ✅ Fire-based CLI for direct usage
-- ✅ Async/await message streaming
-- ✅ Basic error handling and timeouts
-- ✅ Type definitions and CLAIF compatibility
-- ✅ Compatibility layer for standalone usage
-- ✅ Comprehensive documentation (README, CHANGELOG)
-- ✅ Proper packaging configuration
-- ✅ Entry points and CLI commands
+### Core Functionality
+1. **Gemini CLI Integration**
+   - Robust subprocess wrapper for gemini-cli
+   - Cross-platform CLI discovery and execution
+   - Async message streaming with proper error handling
+   - Loguru-based logging (no rich dependencies)
 
-### v1.0 Release Summary
-Released on 2025-01-02 with all essential features:
-- Full subprocess-based integration with Gemini CLI
-- Cross-platform CLI discovery (Windows, macOS, Linux)
-- Fire-based CLI with rich terminal output
-- Async support using anyio
-- Auto-approval and yes-mode options
-- Robust error handling
-- Complete documentation
+2. **Auto-Install Support (Issue #201)**
+   - Detect missing gemini-cli installation
+   - Auto-install via npm when missing
+   - Integrate with bun bundling for offline scenarios
+   - Clear user guidance during installation process
 
-### Out of Scope for v1.0 (Future Work)
-- Advanced features (caching, retries, pooling)
-- Complex configuration management
-- Multi-model orchestration
-- Performance optimizations
-- Advanced error recovery
-- Session management
-- Tool approval strategies
+3. **Streamlined CLI Interface**
+   - Fire-based CLI with simple, clean output
+   - Essential commands: ask, stream, health, models
+   - Version information and comprehensive help
+   - Proper error handling with actionable messages
 
-## Implementation Status
+4. **Cross-Platform Reliability**
+   - Works seamlessly on Windows, macOS, Linux
+   - Handles different Node.js installation paths
+   - Robust subprocess management with timeouts
+   - Platform-specific path discovery
 
-### Completed
-1. **Core Architecture**
-   - Module structure with clear separation
-   - CLAIF interface compatibility
-   - Type definitions
+### Simplified Architecture
 
-2. **Transport Layer**
-   - Subprocess management with anyio
-   - CLI discovery logic
-   - Basic command construction
-   - Output parsing (JSON/text)
+```
+claif_gem/
+├── transport.py   # Subprocess management & CLI discovery
+├── client.py      #Claif provider interface
+├── cli.py         # Fire-based CLI (loguru only)
+├── types.py       # Type definitions
+├── install.py     # Auto-install functionality
+└── _compat/       # Compatibility layer
+```
 
-3. **CLI Interface**
-   - Fire-based commands
-   - Rich terminal output
-   - Basic health check
-   - Model listing
+## Implementation Plan
 
-### Next Steps (v1.1+)
-1. **Testing**
-   - Add comprehensive unit tests with subprocess mocking
-   - Test CLI discovery logic across platforms
-   - Test message parsing edge cases
-   - Integration tests with CLAIF core
+### Phase 1: Dependency Cleanup
+- [ ] Remove all rich imports and dependencies
+- [ ] Replace rich.console with loguru logging
+- [ ] Simplify progress indicators and live updates
+- [ ] Use clean text-based output formatting
 
-2. **Performance**
-   - Implement connection pooling
-   - Add retry logic for transient failures
-   - Response caching for repeated queries
+### Phase 2: Auto-Install Integration
+- [ ] Implement gemini-cli detection logic
+- [ ] Add npm installation wrapper
+- [ ] Integrate with bun bundling system
+- [ ] Provide clear installation prompts and guidance
 
-3. **Features**
-   - Model availability caching
-   - Advanced error recovery
-   - Session management capabilities
+### Phase 3: Testing & Reliability
+- [ ] Comprehensive unit test coverage (80%+)
+- [ ] Mock subprocess calls for reliable testing
+- [ ] Cross-platform integration tests
+- [ ] Error handling and edge case coverage
 
-## Design Principles
+### Phase 4: Polish & Release
+- [ ] Documentation updates with auto-install info
+- [ ] Performance testing and optimization
+- [ ] Final packaging verification
+- [ ] PyPI release with GitHub Actions
 
-1. **Simplicity First**: Keep the wrapper thin and focused
-2. **Reliability**: Handle subprocess communication robustly
-3. **Compatibility**: Maintain CLAIF interface contract
-4. **Minimal Dependencies**: Only what's necessary
-5. **Clear Errors**: Help users understand what went wrong
+## Technical Decisions
 
-## Non-Goals for v1.0
+### Simplified Dependencies
+- **Remove**: rich, complex UI libraries
+- **Keep**: loguru, fire, anyio, gemini-cli integration
+- **Add**: Auto-install utilities and better error handling
 
-- Feature parity with other CLAIF providers
-- Advanced subprocess management (pooling, etc.)
-- Complex retry logic
-- Caching mechanisms
-- Session persistence
-- Direct Gemini API integration (only CLI wrapper)
+### Error Handling Strategy
+- Detect missing CLI gracefully with clear messages
+- Provide actionable installation instructions
+- Handle subprocess failures with helpful context
+- Timeout management with user-friendly messages
 
-## Success Criteria for v1.0
+### Cross-Platform Support
+- Robust CLI discovery across different OS environments
+- Handle various Node.js installation paths
+- Platform-specific subprocess management
+- Consistent behavior across operating systems
 
-1. Can be installed via pip
-2. Works with CLAIF framework
-3. Handles basic queries reliably
-4. Provides clear error messages
-5. Has basic test coverage
-6. Documentation is complete
+## Success Metrics
 
-## Future Considerations (Post v1.0)
+1. **Usability**: Works with `uvx claif_gem` immediately
+2. **Reliability**: Handles missing dependencies gracefully
+3. **Performance**: < 100ms overhead per query
+4. **Cross-platform**: Tested on Windows, macOS, Linux
+5. **Maintainability**: Clean, well-tested codebase
 
-- Connection pooling for better performance
-- Retry logic for transient failures
-- Response caching
-- Better error recovery
-- Session management
-- Direct API integration option
+## Quality Gates
+
+### Before Release
+- [ ] 80%+ unit test coverage
+- [ ] All tests pass on Python 3.12+
+- [ ] Cross-platform testing completed
+- [ ] No rich dependencies remaining
+- [ ] Auto-install functionality verified
+- [ ] Documentation complete and accurate
+
+### Post-Release Monitoring
+- User feedback on installation experience
+- Performance metrics in real-world usage
+- Cross-platform compatibility reports
+- Integration success withClaif ecosystem
+
+## Future Enhancements (Post-MVP)
+
+### v1.2+ Considerations
+- Response caching for improved performance
+- Session management capabilities
+- Advanced retry logic with exponential backoff
+- Connection pooling for multiple queries
+- Direct Gemini API integration option
+
+### Non-Goals for MVP
+- Complex UI/formatting features
+- Advanced configuration management
+- Performance optimizations beyond basics
+- Extensive plugin systems
+- Web interfaces
+
+## Release Strategy
+
+- **v1.1**: Production MVP with auto-install and no rich deps
+- **v1.2**: Performance improvements and enhanced features
+- **v2.0**: Major enhancements based on user feedback
+
+This plan prioritizes delivering a reliable, user-friendly tool that works immediately upon installation while maintaining the flexibility to grow based on actual usage patterns and feedback.

@@ -8,7 +8,7 @@ from loguru import logger
 try:
     from claif.common import ClaifOptions, Message
 except ImportError:
-    from claif_gem._compat import ClaifOptions, Message
+    from claif.common import ClaifOptions, Message
 from claif_gem.client import query as gemini_query
 from claif_gem.types import GeminiOptions
 
@@ -22,11 +22,11 @@ async def query(
     prompt: str,
     options: ClaifOptions | None = None,
 ) -> AsyncIterator[Message]:
-    """Query Gemini using CLAIF interface.
+    """Query Gemini usingClaif interface.
 
     Args:
         prompt: The prompt to send to Gemini
-        options: Optional CLAIF options
+        options: OptionalClaif options
 
     Yields:
         Messages from Gemini
@@ -34,7 +34,7 @@ async def query(
     if options is None:
         options = ClaifOptions()
 
-    # Convert CLAIF options to Gemini options
+    # ConvertClaif options to Gemini options
     gemini_options = GeminiOptions(
         model=options.model,
         temperature=options.temperature,

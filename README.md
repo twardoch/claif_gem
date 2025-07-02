@@ -1,18 +1,18 @@
-# CLAIF_GEM - Google Gemini Provider for CLAIF
+#`claif_gem` - Google Gemini Provider forClaif
 
 ## Quickstart
 
-CLAIF_GEM provides a Python interface and CLI wrapper for Google's Gemini AI models. It integrates the Gemini CLI tool into the CLAIF framework, enabling you to query Gemini models with a simple command or Python API call. Version 1.0.4 improves subprocess reliability by switching to native asyncio.
+CLAIF_GEM provides a Python interface and CLI wrapper for Google's Gemini AI models. It integrates the Gemini CLI tool into theClaif framework, enabling you to query Gemini models with a simple command or Python API call. Version 1.0.4 improves subprocess reliability by switching to native asyncio.
 
 ```bash
 pip install claif_gem && claif-gem query "Explain quantum computing in one sentence"
 ```
 
-CLAIF_GEM is the Google Gemini provider implementation for the CLAIF (Command-Line Artificial Intelligence Framework). It wraps the [Gemini CLI](https://github.com/google-gemini/gemini-cli/) to integrate Google's Gemini AI models into the unified CLAIF ecosystem.
+CLAIF_GEM is the Google Gemini provider implementation for theClaif (Command-Line Artificial Intelligence Framework). It wraps the [Gemini CLI](https://github.com/google-gemini/gemini-cli/) to integrate Google's Gemini AI models into the unifiedClaif ecosystem.
 
-## What is CLAIF_GEM?
+## What is`claif_gem`?
 
-CLAIF_GEM provides a Python interface and command-line wrapper for the Google Gemini CLI tool. It enables seamless integration of Google's Gemini language models with the CLAIF framework through subprocess management and message translation.
+CLAIF_GEM provides a Python interface and command-line wrapper for the Google Gemini CLI tool. It enables seamless integration of Google's Gemini language models with theClaif framework through subprocess management and message translation.
 
 Key features:
 - **Subprocess-based integration** with the Gemini CLI binary
@@ -49,9 +49,9 @@ cd claif_gem
 pip install -e .
 ```
 
-### With CLAIF Framework
+### WithClaif Framework
 ```bash
-# Install CLAIF with all providers
+# InstallClaif with all providers
 pip install claif[all]
 
 # Or just with Gemini support
@@ -174,11 +174,11 @@ asyncio.run(main())
 ┌─────────────────────┐
 │   User Application  │
 ├─────────────────────┤
-│    CLAIF Core       │
+│   Claif Core       │
 ├─────────────────────┤
-│    CLAIF_GEM        │
+│   `claif_gem`        │
 │  ┌───────────────┐  │
-│  │   __init__.py │  │ ← Main entry point, CLAIF interface
+│  │   __init__.py │  │ ← Main entry point,Claif interface
 │  ├───────────────┤  │
 │  │    cli.py     │  │ ← Fire-based CLI commands
 │  ├───────────────┤  │
@@ -199,7 +199,7 @@ asyncio.run(main())
 
 #### 1. **Main Module** (`__init__.py`)
 - Provides the `query()` function as the main entry point
-- Converts CLAIF's `ClaifOptions` to `GeminiOptions`
+- ConvertsClaif's `ClaifOptions` to `GeminiOptions`
 - Delegates to the client module for execution
 - Exports public API: `query` and `GeminiOptions`
 
@@ -213,7 +213,7 @@ asyncio.run(main())
 #### 3. **Client Module** (`client.py`)
 - `GeminiClient` class manages the query lifecycle
 - Coordinates with transport layer
-- Converts Gemini messages to CLAIF message format
+- Converts Gemini messages toClaif message format
 - Module-level `_client` instance for convenience
 
 #### 4. **Transport Module** (`transport.py`)
@@ -228,12 +228,12 @@ asyncio.run(main())
 - `GeminiOptions`: Configuration dataclass
 - `GeminiMessage`: Response message type
 - `ResultMessage`: Metadata and error information
-- Type conversion methods to CLAIF formats
+- Type conversion methods toClaif formats
 
 ### Message Flow
 
 1. **Query Entry**: User calls `query()` with prompt and options
-2. **Option Translation**: CLAIF options → GeminiOptions
+2. **Option Translation**:Claif options → GeminiOptions
 3. **Client Processing**: GeminiClient validates and prepares query
 4. **Transport Execution**:
    - Find Gemini CLI binary
@@ -244,7 +244,7 @@ asyncio.run(main())
    - Try JSON parsing first
    - Fallback to plain text
    - Convert to GeminiMessage
-6. **Message Conversion**: GeminiMessage → CLAIF Message
+6. **Message Conversion**: GeminiMessage →Claif Message
 7. **Async Yield**: Messages yielded to caller
 
 ### CLI Discovery
@@ -282,9 +282,9 @@ gemini \
 - `GEMINI_SDK=1`: Set by transport to indicate SDK usage
 - `CLAIF_PROVIDER=gemini`: Provider identification
 
-## Why Use CLAIF_GEM?
+## Why Use`claif_gem`?
 
-1. **Unified Interface**: Access Gemini through the standard CLAIF API
+1. **Unified Interface**: Access Gemini through the standardClaif API
 2. **Cross-Platform**: Automatic CLI discovery works on Windows, macOS, Linux
 3. **Async First**: Built on anyio for efficient concurrent operations
 4. **Rich CLI**: Fire-based interface with progress indicators and formatting
