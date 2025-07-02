@@ -1,179 +1,174 @@
-# claif_gem TODO List - v1.x Stable MVP
+# claif_gem TODO List - v1.0 MVP Stability Focus
 
-## Immediate Priority (v1.0.7)
+## CRITICAL (Blocking v1.0 Release)
 
-### Unit Testing
-- [ ] Add pytest test suite for all modules
-- [ ] Test transport.py subprocess handling
-- [ ] Test client.py message conversion
-- [ ] Test CLI discovery logic
-- [ ] Test command construction
-- [ ] Test install.py functionality
-- [ ] Mock subprocess operations
-- [ ] Test timeout and cancellation
-- [ ] Achieve 80%+ code coverage
+### Test Suite Implementation
+- [ ] **Add comprehensive pytest test suite** - Cover all modules with mocked subprocess operations
+- [ ] **Mock all anyio.open_process calls** - Test transport.py with fake gemini-cli processes
+- [ ] **Test command construction** - Verify all Gemini CLI arguments are built correctly
+- [ ] **Achieve 80%+ test coverage** - Verify accuracy with clean test environments
+- [ ] **Test timeout and cancellation** - Ensure proper cleanup under all conditions
 
-### Subprocess Cleanup
-- [ ] Handle process termination cleanly
-- [ ] Fix resource leaks
-- [ ] Proper async cleanup
+### Critical Bug Fixes
+- [ ] **Fix subprocess lifecycle management** - Proper process termination and cleanup
+- [ ] **Eliminate resource leaks** - No hanging processes or memory leaks
+- [ ] **Improve error handling** - Clear, actionable messages for all failure modes
+- [ ] **Fix async cleanup issues** - Proper cancellation and resource management
 
-### Error Messages
-- [ ] Add context to subprocess errors
-- [ ] Clear API key error messages
-- [ ] Better error display
+### Essential Functionality
+- [ ] **CLI discovery works reliably** - Find gemini-cli in various installation locations
+- [ ] **Basic operations function** - Query, response parsing, error handling work
+- [ ] **Auto-install verification** - Gemini CLI installs correctly when missing
 
-## Short-term Priority (v1.1.0)
+## HIGH PRIORITY (Required for Stable Release)
+
+### Cross-Platform Reliability (Especially Windows)
+- [ ] **Windows .cmd/.bat wrapper support** - Handle Windows executable variations
+- [ ] **Test on Windows, macOS, Linux** - Verify all functionality works across platforms
+- [ ] **Handle path spaces and special characters** - Robust path handling
+- [ ] **Support various install locations** - npm global, local, custom paths
+- [ ] **Executable permissions** - Proper handling on Unix systems
+
+### Subprocess Management
+- [ ] **Process group handling** - Prevent zombie processes
+- [ ] **Stream buffering optimization** - Handle large outputs efficiently  
+- [ ] **Timeout management** - Graceful timeouts with proper cleanup
+- [ ] **Error capture** - Collect stderr for meaningful error messages
 
 ### Integration Testing
-- [ ] Test with real Gemini CLI
-- [ ] Test auto-install flow
-- [ ] Test different response formats
-- [ ] Test error conditions
-- [ ] Cross-platform compatibility
+- [ ] **Mock CLI testing** - Comprehensive fake gemini-cli for testing
+- [ ] **End-to-end workflows** - Complete user scenarios
+- [ ] **Error recovery testing** - Network failures, timeouts, crashes
+- [ ] **Installation flow testing** - Auto-install in clean environments
 
-### Cross-Platform Testing
-- [ ] Test all discovery paths
-- [ ] Handle Windows .cmd files
-- [ ] Support custom install paths
-- [ ] Verify executable permissions
-- [ ] Handle path spaces correctly
-- [ ] Windows path handling
-- [ ] macOS security permissions
-- [ ] Linux distribution variations
-- [ ] WSL compatibility
-- [ ] Docker container support
+## MEDIUM PRIORITY (Nice to Have for v1.0)
 
-### Documentation
-- [ ] Installation guide
-- [ ] API key setup guide
-- [ ] Model selection guide
-- [ ] Auto-approve usage
-- [ ] Troubleshooting section
+### Essential Documentation
+- [ ] **Installation guide** - Clear setup instructions with troubleshooting
+- [ ] **Basic usage examples** - Common operations and workflows
+- [ ] **API configuration guide** - Setting up API keys and models
+- [ ] **Auto-approve usage guide** - Safe automation practices
+- [ ] **Error troubleshooting** - Solutions for common problems
 
-## Medium-term Priority (v1.2.0)
+### Code Quality
+- [ ] **Complete docstrings** - All public functions documented
+- [ ] **Type hint coverage** - 100% type annotations
+- [ ] **Performance profiling** - Basic optimization of critical paths
 
-### Advanced Gemini Features
-- [ ] Full options support
-- [ ] Response metadata
-- [ ] Extended CLI options
+## SUCCESS CRITERIA FOR v1.0
 
-### Response Caching
-- [ ] Implement caching layer
-- [ ] Cache invalidation
-- [ ] TTL management
+### Reliability (Must Have)
+- ✅ **99%+ success rate** for subprocess operations
+- ✅ **No resource leaks** in normal operation
+- ✅ **Graceful error handling** with clear messages
+- ✅ **Stable async operations** - Proper cleanup and cancellation
 
-### Direct API Option
-- [ ] Native Gemini API integration
-- [ ] Fallback mechanism
-- [ ] Performance comparison
+### Testing (Must Have)
+- ✅ **80%+ test coverage** with verified accuracy
+- ✅ **All critical paths tested** including error conditions
+- ✅ **Mocked subprocess dependencies** for reliable testing
+- ✅ **Cross-platform compatibility** verified
 
-## Testing & Reliability
+### User Experience (Should Have)
+- ✅ **Auto-install works reliably** in clean environments
+- ✅ **Clear error messages** for setup and usage problems
+- ✅ **Windows compatibility** with proper .cmd handling
+- ✅ **Fast startup time** (<3 seconds including CLI detection)
 
-### Subprocess Reliability
-- [ ] Test with slow/hanging processes
-- [ ] Verify memory cleanup
-- [ ] Test concurrent operations
-- [ ] Handle zombie processes
+## NON-GOALS FOR v1.0
 
-### Gemini-Specific Errors
-- [ ] Parse Gemini error formats
-- [ ] Handle rate limits gracefully
-- [ ] Context length errors
-- [ ] Authentication failures
-- [ ] Model not found errors
+Explicitly excluding to maintain focus:
 
-### Installation Robustness
-- [ ] Verify npm/bun availability
-- [ ] Handle partial installs
+- ❌ **Advanced Gemini features** (full options support, metadata)
+- ❌ **Response caching** mechanisms
+- ❌ **Performance optimization** beyond basic functionality
+- ❌ **Direct API integration** (native Gemini API)
+- ❌ **Database persistence**
+- ❌ **Multi-user support**
+- ❌ **Complex configuration** options
+- ❌ **Response transformation** features
+
+## RISK MITIGATION
+
+### High Risk Items
+1. **Windows compatibility issues** → Could block Windows adoption
+   - **Mitigation**: Comprehensive Windows testing, .cmd/.bat wrapper support
+2. **Subprocess management bugs** → Could cause hangs or crashes
+   - **Mitigation**: Comprehensive testing with timeouts and mocking
+3. **Cross-platform path issues** → Could limit adoption
+   - **Mitigation**: Test matrix with GitHub Actions
+
+### Medium Risk Items
+1. **CLI discovery failures** → Could prevent basic functionality
+   - **Mitigation**: Multiple search paths, clear error messages
+2. **Installation problems** → Could block user onboarding
+   - **Mitigation**: Detailed troubleshooting guides
+
+## MODULE FOCUS
+
+### transport.py (CRITICAL)
+- [ ] Fix process lifecycle management and cleanup
+- [ ] Improve CLI discovery logic for all platforms
+- [ ] Add timeout and cancellation support
+- [ ] Enhanced error context and handling
+
+### client.py (HIGH)
+- [ ] Add message validation and error wrapping
+- [ ] Improve error propagation
+- [ ] Connection pooling if beneficial
+- [ ] Retry logic optimization
+
+### cli.py (MEDIUM)
+- [ ] Standardize help text and error display
+- [ ] Add progress indicators for long operations
+- [ ] Better argument validation
+- [ ] Consistent output formatting
+
+### install.py (MEDIUM)
+- [ ] Robust npm/bun detection
+- [ ] Handle partial installations
 - [ ] Support proxy environments
-- [ ] Offline install options
-- [ ] Version compatibility checks
+- [ ] Clear installation error messages
 
-## Transport Layer Improvements
+## DEFINITION OF DONE
 
-### Async Operations
-- [ ] Proper cleanup on cancellation
-- [ ] Handle process groups
-- [ ] Stream buffering optimization
-- [ ] Backpressure handling
-- [ ] Resource leak prevention
+For each task to be considered complete:
 
-### Performance
-- [ ] Profile subprocess overhead
-- [ ] Optimize JSON/text parsing
-- [ ] Reduce memory usage
-- [ ] Connection reuse
-- [ ] Response streaming
+- [ ] **Implementation** meets requirements and handles edge cases
+- [ ] **Tests** cover the functionality with comprehensive mocks
+- [ ] **Error handling** includes clear, actionable messages
+- [ ] **Documentation** updated for user-facing changes
+- [ ] **Cross-platform** compatibility verified (especially Windows)
+- [ ] **Performance** impact measured and acceptable
 
-## Gemini-Specific Features
+## GEMINI-SPECIFIC CONSIDERATIONS
 
-### Options Support
-- [ ] Validate all Gemini options
-- [ ] Handle max-context-length
-- [ ] Support auto-approve mode
-- [ ] Implement yes-mode properly
-- [ ] System prompt handling
+### Windows Platform Priority
+- **Higher priority** for Windows compatibility due to Gemini CLI installation patterns
+- Focus on `.cmd` and `.bat` wrapper detection
+- Handle Windows path conventions and permissions
 
-### Response Handling
-- [ ] Parse structured responses
-- [ ] Handle streaming correctly
-- [ ] Support different output formats
-- [ ] Error response parsing
-- [ ] Metadata extraction
+### CLI Options Support
+- Keep minimal for v1.0 - basic query functionality only
+- Defer advanced options (max-context-length, auto-approve) to v1.1+
+- Focus on reliable basic operations
 
-## Code Organization
+## POST-v1.0 ROADMAP
 
-### Key Module Improvements
+### v1.1 (Enhanced Features)
+- Advanced Gemini features (full options support, auto-approve mode)
+- Response caching for performance
+- Extended CLI options support
+- Improved Windows integration
 
-#### transport.py
-- [ ] Better process lifecycle management
-- [ ] Improved CLI discovery logic
-- [ ] Enhanced error context
-- [ ] Performance monitoring
+### v1.2 (Performance & Polish)
+- Startup time optimization
+- Memory usage reduction
+- Advanced timeout handling
+- Response streaming optimization
 
-#### client.py
-- [ ] Message validation
-- [ ] Error wrapping
-- [ ] Connection pooling
-- [x] Retry logic ✅ COMPLETED - Implemented tenacity-based retry with exponential backoff
-
-#### cli.py
-- [ ] Standardized help text
-- [ ] Progress indicators
-- [ ] Better error display
-- [ ] Command shortcuts
-
-## Quality Standards
-
-### Testing Focus
-- [ ] Mock all anyio.open_process calls
-- [ ] Test CLI discovery paths
-- [ ] Verify command construction
-- [ ] Test JSON/text parsing
-- [ ] Validate error handling
-
-### Performance Testing
-- [ ] Subprocess spawn overhead
-- [ ] Response parsing speed
-- [ ] Memory usage profiling
-- [ ] Concurrent operations
-- [ ] Large response handling
-
-## Success Metrics
-
-- [ ] **Reliability**: 99.9% success rate for subprocess operations
-- [ ] **Performance**: < 100ms overhead per operation
-- [ ] **Testing**: 80%+ test coverage with mocks
-- [ ] **Error Handling**: Clear, actionable error messages
-- [ ] **Cross-Platform**: Verified on Windows, macOS, Linux
-- [ ] **Documentation**: Complete user and API docs
-- [ ] **Installation**: Auto-install works everywhere
-
-## Non-Goals for v1.x
-
-- Complex UI features
-- Custom protocol extensions
-- Database persistence
-- Multi-user support
-- Response transformation
+### v2.0 (Major Features)
+- Direct Gemini API integration (bypass CLI)
+- Advanced caching and persistence
+- Multi-model routing
+- Performance rewrite
