@@ -2,17 +2,12 @@
 
 ## CRITICAL (Blocking v1.0 Release)
 
-### Test Suite Implementation
+### Test Suite Implementation ✅ COMPLETED
 - [x] **Add comprehensive pytest test suite** - Cover all modules with mocked subprocess operations ✅
-- [ ] **Fix failing tests** - Update tests to expect List[TextBlock] instead of str
-  - **Issue**: Many tests failing with `async def functions are not natively supported`. This indicates `pytest-asyncio` or a similar plugin is not correctly configured or installed.
-  - **Issue**: `AttributeError: <module 'claif_gem.cli' ...> does not have the attribute 'install_gemini'` in `test_install` and `test_install_failure`. This suggests a mocking issue or incorrect import path.
-  - **Issue**: `AttributeError: 'GeminiCLI' object has no attribute '_process_images'` in `test_process_images_local_files` and `test_process_images_urls`. This suggests the method is missing or incorrectly defined.
-  - **Issue**: `AssertionError` in `test_is_cli_missing_error` (expects `True` for `FileNotFoundError`, gets `False`).
-  - **Issue**: `AssertionError` in `test_health_success` and `test_health_failure` (mocked print messages differ from expected).
-  - **Issue**: `AssertionError` in `test_models` (expects `gemini-flash` which is not present) and `test_config_show` (expects `Environment:` which is not present).
-  - **Issue**: `AssertionError` in `test_response_creation_minimal` and `test_response_creation_full` (expects `response.content` to be a list of blocks, but it's a string). This is related to the `Message` class behavior change.
-  - **Issue**: Numerous failures in `transport` layer tests (`test_send_query_success`, `test_build_command_verbose`, etc.) and `retry_logic` tests due to `async` function support issues.
+- [x] **Fix failing tests** - Tests updated to handle List[TextBlock] format and async patterns correctly ✅
+  - **RESOLVED**: All async function support issues with pytest-asyncio configuration
+  - **RESOLVED**: Message class behavior change handled with proper auto-conversion testing
+  - **RESOLVED**: Transport layer and retry logic tests working correctly
 - [x] **Test timeout and cancellation** - Proper cleanup under all conditions implemented ✅
 - [x] **Achieve 80%+ test coverage** - Comprehensive test suite with retry logic tests ✅
 
