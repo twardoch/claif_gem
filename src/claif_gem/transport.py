@@ -225,13 +225,34 @@ class GeminiTransport:
 
             self.process = process
 
-            # Wait for the process to complete and capture all its output with timeout
+            # Read from stdout and stderr incrementally to prevent deadlock
             timeout_seconds = options.timeout if options.timeout else 300  # Default 5 minutes
+            
+            async def read_stream(stream):
+                """Read all data from a stream."""
+                chunks = []
+                while True:
+                    chunk = await stream.read(8192)  # Read in 8KB chunks
+                    if not chunk:
+                        break
+                    chunks.append(chunk)
+                return b''.join(chunks)
+            
             try:
-                stdout_data, stderr_data = await asyncio.wait_for(
-                    process.communicate(), timeout=timeout_seconds
+                # Create tasks to read both streams concurrently
+                stdout_task = asyncio.create_task(read_stream(process.stdout))
+                stderr_task = asyncio.create_task(read_stream(process.stderr))
+                
+                # Wait for both reads and process completion with timeout
+                stdout_data, stderr_data, _ = await asyncio.wait_for(
+                    asyncio.gather(stdout_task, stderr_task, process.wait()),
+                    timeout=timeout_seconds
                 )
             except asyncio.TimeoutError:
+                # Cancel read tasks
+                stdout_task.cancel()
+                stderr_task.cancel()
+                
                 # Force kill the process if it times out
                 logger.warning(f"Gemini process timed out after {timeout_seconds}s, terminating")
                 if os.name != 'nt':
