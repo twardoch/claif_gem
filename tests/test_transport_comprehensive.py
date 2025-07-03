@@ -191,9 +191,8 @@ class TestGeminiTransport:
             messages.append(msg)
         
         assert len(messages) == 2
-        assert len(isinstance(messages[0], GeminiMessage)
-        assert messages[0].content) == 1 and isinstance(messages[0], GeminiMessage)
-        assert messages[0].content[0].text == "Hello from Gemini"
+        assert isinstance(messages[0], GeminiMessage)
+        assert len(messages[0].content) == 1 and messages[0].content[0].text == "Hello from Gemini"
         assert messages[0].role == "assistant"
         assert isinstance(messages[1], ResultMessage)
         assert messages[1].error is False
@@ -218,9 +217,8 @@ class TestGeminiTransport:
             messages.append(msg)
         
         assert len(messages) == 2
-        assert len(isinstance(messages[0], GeminiMessage)
-        assert messages[0].content) == 1 and isinstance(messages[0], GeminiMessage)
-        assert messages[0].content[0].text == "Plain text response from Gemini"
+        assert isinstance(messages[0], GeminiMessage)
+        assert len(messages[0].content) == 1 and messages[0].content[0].text == "Plain text response from Gemini"
         assert isinstance(messages[1], ResultMessage)
 
     @pytest.mark.asyncio

@@ -66,9 +66,8 @@ class TestGeminiClient:
             messages.append(msg)
 
         assert len(messages) == 1
-        assert len(isinstance(messages[0], Message)
-        assert messages[0].content) == 1 and isinstance(messages[0], Message)
-        assert messages[0].content[0].text == "Hello from Gemini"
+        assert isinstance(messages[0], Message)
+        assert len(messages[0].content) == 1 and messages[0].content[0].text == "Hello from Gemini"
         assert messages[0].role == MessageRole.ASSISTANT
 
         mock_transport.connect.assert_called_once()

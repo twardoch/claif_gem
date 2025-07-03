@@ -4,6 +4,7 @@
 import json
 import os
 import shlex
+import signal
 import uuid
 from collections.abc import AsyncIterator
 from pathlib import Path
@@ -55,16 +56,37 @@ class GeminiTransport:
         Cleans up the transport by terminating any running Gemini CLI subprocess.
 
         Ensures that the process is properly terminated and its resources are released.
-        Logs a debug message if an error occurs during termination.
+        Handles process groups on Unix systems to prevent zombie processes.
         """
         if self.process:
             try:
-                # Terminate the process and wait for it to exit
-                self.process.terminate()
-                await self.process.wait()
+                import asyncio
+                
+                # Try graceful termination first
+                if self.process.returncode is None:
+                    self.process.terminate()
+                    
+                    # Wait for graceful termination with timeout
+                    try:
+                        await asyncio.wait_for(self.process.wait(), timeout=5.0)
+                    except asyncio.TimeoutError:
+                        # Force kill if graceful termination failed
+                        logger.debug("Gemini process didn't terminate gracefully, forcing kill")
+                        if os.name != 'nt':
+                            # Kill entire process group on Unix
+                            try:
+                                os.killpg(os.getpgid(self.process.pid), signal.SIGKILL)
+                            except ProcessLookupError:
+                                pass  # Process already dead
+                        else:
+                            # Just kill the process on Windows
+                            self.process.kill()
+                        
+                        # Wait for forced termination
+                        await self.process.wait()
+                
                 self.process = None
             except Exception as e:
-                # Log any errors encountered during process termination
                 logger.debug(f"Error during Gemini CLI process disconnect: {e}")
                 self.process = None
 
@@ -187,18 +209,40 @@ class GeminiTransport:
 
             # Create the subprocess. Using `asyncio.create_subprocess_exec` for direct
             # subprocess management, capturing stdout and stderr.
+            # Use process group on Unix for better cleanup
+            preexec_fn = None
+            if os.name != 'nt':  # Unix-like systems
+                preexec_fn = os.setsid
+                
             process = await asyncio.create_subprocess_exec(
                 *command,
                 env=env,
                 cwd=options.cwd,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
+                preexec_fn=preexec_fn,
             )
 
             self.process = process
 
-            # Wait for the process to complete and capture all its output.
-            stdout_data, stderr_data = await process.communicate()
+            # Wait for the process to complete and capture all its output with timeout
+            timeout_seconds = options.timeout if options.timeout else 300  # Default 5 minutes
+            try:
+                stdout_data, stderr_data = await asyncio.wait_for(
+                    process.communicate(), timeout=timeout_seconds
+                )
+            except asyncio.TimeoutError:
+                # Force kill the process if it times out
+                logger.warning(f"Gemini process timed out after {timeout_seconds}s, terminating")
+                if os.name != 'nt':
+                    try:
+                        os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                else:
+                    process.kill()
+                await process.wait()
+                raise TransportError(f"Command timed out after {timeout_seconds}s")
 
             duration: float = anyio.current_time() - start_time
 
@@ -262,6 +306,28 @@ class GeminiTransport:
             )
 
         except Exception as e:
+            # Clean up any running process before handling the exception
+            if self.process and self.process.returncode is None:
+                logger.debug(f"Cleaning up Gemini process due to exception: {e}")
+                try:
+                    import asyncio
+                    # Try graceful termination first
+                    process.terminate()
+                    try:
+                        await asyncio.wait_for(process.wait(), timeout=2.0)
+                    except asyncio.TimeoutError:
+                        # Force kill if needed
+                        if os.name != 'nt':
+                            try:
+                                os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+                            except ProcessLookupError:
+                                pass
+                        else:
+                            process.kill()
+                        await process.wait()
+                except Exception as cleanup_error:
+                    logger.debug(f"Error during Gemini process cleanup: {cleanup_error}")
+            
             # Catch any unexpected exceptions during execution and log them.
             logger.error(f"An unexpected transport error occurred: {e}")
             # Re-raise specific exceptions that are meant to be handled by the retry logic.
@@ -355,7 +421,7 @@ class GeminiTransport:
             env = os.environ.copy()
 
         # Set specific environment variables for the Gemini SDK and Claif provider identification.
-        env["GEMINI_SDK"] = "1"
+        env["GEMINI_CLI_INTERNAL"] = "1"
         env["CLAIF_PROVIDER"] = "gemini"
         return env
 

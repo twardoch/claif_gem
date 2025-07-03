@@ -39,9 +39,8 @@ async def test_retry_on_quota_exhausted():
         
         # Should have retried and succeeded
         assert len(messages) == 2
-        assert len(isinstance(messages[0], GeminiMessage)
-        assert messages[0].content) == 1 and isinstance(messages[0], GeminiMessage)
-        assert messages[0].content[0].text == "Test response"
+        assert isinstance(messages[0], GeminiMessage)
+        assert len(messages[0].content) == 1 and messages[0].content[0].text == "Test response"
         assert isinstance(messages[1], ResultMessage)
         assert not messages[1].error
 
