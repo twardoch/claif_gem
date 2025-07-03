@@ -1,0 +1,135 @@
+name: Test claif_gem
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'claif_gem/**'
+      - '.github/workflows/claif_gem.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'claif_gem/**'
+      - '.github/workflows/claif_gem.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-claif_gem
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Code Quality (claif_gem)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: claif_gem
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Ruff lint
+        uses: astral-sh/ruff-action@v3
+        with:
+          version: "latest"
+          args: "check --output-format=github"
+          src: "claif_gem"
+
+      - name: Run Ruff Format
+        uses: astral-sh/ruff-action@v3
+        with:
+          version: "latest"
+          args: "format --check --respect-gitignore"
+          src: "claif_gem"
+
+  test:
+    name: Test claif_gem
+    needs: quality
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: claif_gem
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+          cache-suffix: claif_gem-${{ matrix.os }}-${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system --upgrade pip
+          uv pip install --system ".[test]"
+
+      - name: Run tests with Hatch (Unix)
+        if: runner.os != 'Windows'
+        run: uvx hatch test
+
+      - name: Run tests with Hatch (Windows)
+        if: runner.os == 'Windows'
+        run: uvx hatch test
+        shell: cmd
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-claif_gem-${{ matrix.python-version }}-${{ matrix.os }}
+          path: claif_gem/coverage.xml
+          retention-days: 5
+
+  build:
+    name: Build claif_gem
+    needs: test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: claif_gem
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install build tools
+        run: uv pip install --system build hatchling hatch-vcs
+
+      - name: Build distributions
+        run: uv run python -m build --outdir dist
+
+      - name: Upload distribution artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: claif_gem-dist-files
+          path: claif_gem/dist/
+          retention-days: 5
