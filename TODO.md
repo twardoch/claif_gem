@@ -3,21 +3,13 @@
 ## CRITICAL (Blocking v1.0 Release)
 
 ### Test Suite Implementation
-- [ ] **Add comprehensive pytest test suite** - Cover all modules with mocked subprocess operations
-- [ ] **Mock all anyio.open_process calls** - Test transport.py with fake gemini-cli processes
-- [ ] **Test command construction** - Verify all Gemini CLI arguments are built correctly
-- [ ] **Achieve 80%+ test coverage** - Verify accuracy with clean test environments
+- [x] **Add comprehensive pytest test suite** - Cover all modules with mocked subprocess operations
+- [ ] **Fix failing tests** - Update tests to expect List[TextBlock] instead of str
 - [ ] **Test timeout and cancellation** - Ensure proper cleanup under all conditions
-
-### Critical Bug Fixes
-- [ ] **Fix subprocess lifecycle management** - Proper process termination and cleanup
-- [ ] **Eliminate resource leaks** - No hanging processes or memory leaks
-- [ ] **Improve error handling** - Clear, actionable messages for all failure modes
-- [ ] **Fix async cleanup issues** - Proper cancellation and resource management
+- [ ] **Achieve 80%+ test coverage** - Verify accuracy with clean test environments
 
 ### Essential Functionality
 - [ ] **CLI discovery works reliably** - Find gemini-cli in various installation locations
-- [ ] **Basic operations function** - Query, response parsing, error handling work
 - [ ] **Auto-install verification** - Gemini CLI installs correctly when missing
 
 ## HIGH PRIORITY (Required for Stable Release)

@@ -8,24 +8,26 @@
 
 **Core Functionality**: Working Gemini CLI integration ✅
 **Auto-Install**: Automatic CLI installation when missing ✅
-**Subprocess Management**: Async with anyio ✅
-**CLI Interface**: Fire-based with clean output ✅
+**Subprocess Management**: Async with asyncio ✅
+**CLI Interface**: Fire-based with rich console output ✅
 **Retry Logic**: Tenacity-based retry with exponential backoff ✅
 **Error Detection**: Smart detection of quota/rate limit errors ✅
-**Testing**: Comprehensive retry logic test suite ✅
+**Testing**: Comprehensive test suite created but needs fixing ⚠️
+**Subprocess Improvements**: Enhanced async cleanup and resource management ✅
 
 ## MVP v1.x Improvement Plan
 
 ### 1. Testing & Reliability (Critical)
 
 #### Unit Testing
-- [ ] Add pytest test suite for all modules
-  - [ ] Test transport.py subprocess handling
-  - [ ] Test client.py message conversion
-  - [ ] Test CLI discovery logic
-  - [ ] Test command construction
-  - [ ] Test install.py functionality
-- [ ] Mock subprocess operations
+- [x] Add pytest test suite for all modules
+  - [x] Test transport.py subprocess handling
+  - [x] Test client.py message conversion
+  - [x] Test CLI discovery logic
+  - [x] Test command construction
+  - [x] Test install.py functionality
+- [x] Mock subprocess operations
+- [ ] Fix failing tests (List[TextBlock] vs str issue)
 - [ ] Test timeout and cancellation
 - [ ] Achieve 80%+ code coverage
 
@@ -37,7 +39,7 @@
 - [ ] Cross-platform compatibility
 
 #### Subprocess Reliability
-- [ ] Handle process termination cleanly
+- [x] Handle process termination cleanly
 - [ ] Test with slow/hanging processes
 - [ ] Verify memory cleanup
 - [ ] Test concurrent operations
@@ -46,11 +48,11 @@
 ### 2. Error Handling & Messages
 
 #### Better Error Context
-- [ ] Add context to subprocess errors
-- [ ] Clear API key error messages
-- [ ] Installation failure guidance
-- [ ] Network timeout explanations
-- [ ] Model availability errors
+- [x] Add context to subprocess errors
+- [x] Clear API key error messages
+- [x] Installation failure guidance
+- [x] Network timeout explanations
+- [x] Model availability errors
 
 #### Gemini-Specific Errors
 - [ ] Parse Gemini error formats
@@ -78,7 +80,7 @@
 ### 4. Transport Layer Improvements
 
 #### Async Operations
-- [ ] Proper cleanup on cancellation
+- [x] Proper cleanup on cancellation
 - [ ] Handle process groups
 - [ ] Stream buffering optimization
 - [ ] Backpressure handling
@@ -193,21 +195,11 @@ claif_gem/
 ## Development Priorities
 
 ### Immediate (v1.0.7)
-1.  Add pytest test suite for all modules
-2.  Test transport.py subprocess handling
-3.  Test client.py message conversion
-4.  Test CLI discovery logic
-5.  Test command construction
-6.  Test install.py functionality
-7.  Mock subprocess operations
-8.  Test timeout and cancellation
-9.  Achieve 80%+ code coverage
-10. Handle process termination cleanly
-11. Fix resource leaks
-12. Proper async cleanup
-13. Add context to subprocess errors
-14. Clear API key error messages
-15. Better error display
+1.  Fix failing tests (List[TextBlock] vs str)
+2.  Test timeout and cancellation
+3.  Achieve 80%+ code coverage
+4.  Test with slow/hanging processes
+5.  Verify memory cleanup
 
 ### Short-term (v1.1.0)
 1.  Cross-platform testing
