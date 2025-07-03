@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-from claif.common import Message, MessageRole
+from claif.common import Message, MessageRole, TextBlock
 
 
 @dataclass
@@ -57,12 +57,23 @@ class GeminiMessage:
     Represents a single message received from the Gemini CLI.
 
     Attributes:
-        content: The textual content of the message.
+        content: The textual content of the message as a list of TextBlocks.
         role: The role of the sender (e.g., 'assistant', 'user'). Defaults to 'assistant'.
     """
 
-    content: str
+    content: Union[str, List[TextBlock]]
     role: str = "assistant"
+
+    def __post_init__(self) -> None:
+        """
+        Post-initialization hook to normalize string content into a list of TextBlock.
+
+        If the `content` is provided as a string, it is automatically wrapped
+        into a list containing a single `TextBlock` for consistency with the
+        core Claif Message format.
+        """
+        if isinstance(self.content, str):
+            self.content = [TextBlock(text=self.content)]
 
     def to_claif_message(self) -> Message:
         """
@@ -75,7 +86,7 @@ class GeminiMessage:
         claif_role: MessageRole = MessageRole.ASSISTANT if self.role == "assistant" else MessageRole.USER
         return Message(
             role=claif_role,
-            content=self.content,
+            content=self.content,  # Now already in List[TextBlock] format
         )
 
 

@@ -91,7 +91,6 @@ class GeminiCLI:
         image_paths: List[str] | None = None
         if images:
             # Process the comma-separated image string into a list of paths.
-            if images:
             image_paths = process_images(images)
 
         # Create a GeminiOptions object from the provided arguments and configuration.

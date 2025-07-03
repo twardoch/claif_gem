@@ -11,7 +11,8 @@ from claif_gem.types import (
     GeminiMessage,
     ResultMessage,
 )
-from claif.common.types import TransportError, TextBlock
+from claif.common import TransportError
+from claif.common.types import TextBlock
 
 
 def test_version():
