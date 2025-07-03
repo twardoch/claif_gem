@@ -1,6 +1,7 @@
 # this_file: claif_gem/src/claif_gem/install.py
 
 import shutil
+import sys
 from pathlib import Path
 
 from loguru import logger
@@ -56,6 +57,37 @@ def install_gemini_bundled(install_dir: Path, dist_dir: Path) -> bool:
 
 def install_gemini() -> dict:
     """Install Gemini CLI with bundled approach."""
+    import platform
+    import subprocess
+    
+    # Use Windows-specific installer on Windows
+    if platform.system() == "Windows":
+        logger.info("Detected Windows platform, using Windows-specific installer...")
+        
+        # Check if the Windows installer script exists
+        scripts_dir = Path(__file__).parent.parent.parent / "scripts"
+        windows_installer = scripts_dir / "install_windows.py"
+        
+        if windows_installer.exists():
+            try:
+                result = subprocess.run(
+                    [sys.executable, str(windows_installer)],
+                    capture_output=True,
+                    text=True
+                )
+                if result.returncode == 0:
+                    logger.success("✓ Windows installation completed successfully")
+                    return {"installed": ["gemini"], "failed": []}
+                else:
+                    logger.error(f"Windows installation failed: {result.stderr}")
+                    return {"installed": [], "failed": ["gemini"], "message": result.stderr}
+            except Exception as e:
+                logger.error(f"Failed to run Windows installer: {e}")
+                # Fall back to standard installation
+        else:
+            logger.warning("Windows installer not found, using standard installation")
+    
+    # Standard installation for Unix-like systems or fallback
     if not ensure_bun_installed():
         return {"installed": [], "failed": ["gemini"], "message": "bun installation failed"}
 
