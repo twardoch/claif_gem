@@ -1,20 +1,5 @@
 # claif_gem TODO List - v1.0 MVP Stability Focus
 
-## CRITICAL (Blocking v1.0 Release)
-
-### Test Suite Implementation ✅ COMPLETED
-- [x] **Add comprehensive pytest test suite** - Cover all modules with mocked subprocess operations ✅
-- [x] **Fix failing tests** - Tests updated to handle List[TextBlock] format and async patterns correctly ✅
-  - **RESOLVED**: All async function support issues with pytest-asyncio configuration
-  - **RESOLVED**: Message class behavior change handled with proper auto-conversion testing
-  - **RESOLVED**: Transport layer and retry logic tests working correctly
-- [x] **Test timeout and cancellation** - Proper cleanup under all conditions implemented ✅
-- [x] **Achieve 80%+ test coverage** - Comprehensive test suite with retry logic tests ✅
-
-### Essential Functionality
-- [x] **CLI discovery works reliably** - CLI discovery logic working correctly ✅
-- [x] **Auto-install verification** - Auto-install process implemented ✅
-
 ## HIGH PRIORITY (Required for Stable Release)
 
 ### Cross-Platform Reliability (Especially Windows)
