@@ -23,7 +23,7 @@
 
 ### Subprocess Management
 - [ ] **Process group handling** - Prevent zombie processes
-- [ ] **Stream buffering optimization** - Handle large outputs efficiently  
+- [ ] **Stream buffering optimization** - Handle large outputs efficiently
 - [ ] **Timeout management** - Graceful timeouts with proper cleanup
 - [ ] **Error capture** - Collect stderr for meaningful error messages
 

@@ -6,7 +6,8 @@ from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import pytest
-from claif.common.types import TransportError, TextBlock
+from claif.common import TransportError
+from claif.common.types import TextBlock
 from tenacity import RetryError
 
 from claif_gem.transport import GeminiTransport

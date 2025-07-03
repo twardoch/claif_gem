@@ -6,7 +6,8 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from claif_gem.transport import GeminiTransport
 from claif_gem.types import GeminiOptions, ResultMessage, GeminiMessage
-from claif.common.types import TransportError, TextBlock
+from claif.common import TransportError
+from claif.common.types import TextBlock
 
 
 @pytest.mark.asyncio
