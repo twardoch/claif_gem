@@ -67,7 +67,8 @@ class TestGeminiClient:
 
         assert len(messages) == 1
         assert isinstance(messages[0], Message)
-        assert len(messages[0].content) == 1 and messages[0].content[0].text == "Hello from Gemini"
+        assert len(messages[0].content) == 1
+        assert messages[0].content[0].text == "Hello from Gemini"
         assert messages[0].role == MessageRole.ASSISTANT
 
         mock_transport.connect.assert_called_once()
@@ -93,7 +94,8 @@ class TestGeminiClient:
             messages.append(msg)
 
         assert len(messages) == 1
-        assert len(messages[0].content) == 1 and messages[0].content[0].text == "Response"
+        assert len(messages[0].content) == 1
+        assert messages[0].content[0].text == "Response"
 
     @pytest.mark.asyncio
     async def test_query_with_error_result(self, client, mock_transport):
@@ -101,11 +103,7 @@ class TestGeminiClient:
         client.transport = mock_transport
 
         async def mock_send_query(prompt, options):
-            yield ResultMessage(
-                error=True,
-                message="API quota exceeded",
-                session_id="test"
-            )
+            yield ResultMessage(error=True, message="API quota exceeded", session_id="test")
 
         mock_transport.send_query.side_effect = mock_send_query
 
@@ -140,9 +138,11 @@ class TestGeminiClient:
     @pytest.mark.asyncio
     async def test_query_auto_install_on_cli_missing(self, client):
         """Test auto-install when CLI is missing."""
+
         # First attempt raises CLI missing error
         async def first_send_query(prompt, options):
-            raise FileNotFoundError("gemini not found")
+            msg = "gemini not found"
+            raise FileNotFoundError(msg)
 
         # Second attempt (after install) succeeds
         async def second_send_query(prompt, options):
@@ -169,7 +169,8 @@ class TestGeminiClient:
                     messages.append(msg)
 
                 assert len(messages) == 1
-                assert len(messages[0].content) == 1 and messages[0].content[0].text == "Success after install"
+                assert len(messages[0].content) == 1
+                assert messages[0].content[0].text == "Success after install"
                 mock_install.assert_called_once()
                 retry_transport.connect.assert_called_once()
                 retry_transport.disconnect.assert_called_once()
@@ -177,9 +178,11 @@ class TestGeminiClient:
     @pytest.mark.asyncio
     async def test_query_auto_install_fails(self, client):
         """Test when auto-install fails."""
+
         # Mock transport to raise CLI missing error
         async def mock_send_query(prompt, options):
-            raise OSError("gemini not found")
+            msg = "gemini not found"
+            raise OSError(msg)
 
         client.transport.connect = AsyncMock()
         client.transport.disconnect = AsyncMock()
@@ -190,7 +193,7 @@ class TestGeminiClient:
             mock_install.return_value = {
                 "installed": [],
                 "failed": ["gemini"],
-                "message": "Installation failed: no permission"
+                "message": "Installation failed: no permission",
             }
 
             with pytest.raises(Exception) as exc_info:
@@ -208,7 +211,8 @@ class TestGeminiClient:
         client.transport = mock_transport
 
         async def mock_send_query(prompt, options):
-            raise ValueError("Invalid prompt format")
+            msg = "Invalid prompt format"
+            raise ValueError(msg)
 
         mock_transport.send_query.side_effect = mock_send_query
 
@@ -225,7 +229,8 @@ class TestGeminiClient:
         client.transport = mock_transport
 
         async def mock_send_query(prompt, options):
-            raise Exception("Test error")
+            msg = "Test error"
+            raise Exception(msg)
 
         mock_transport.send_query.side_effect = mock_send_query
 
@@ -258,6 +263,7 @@ class TestModuleLevelFunctions:
         """Test that _get_client returns singleton."""
         # Reset global client
         import claif_gem.client
+
         claif_gem.client._client = None
 
         client1 = _get_client()
@@ -271,7 +277,7 @@ class TestModuleLevelFunctions:
         """Test the module-level query function."""
         with patch("claif_gem.client._get_client") as mock_get_client:
             mock_client = MagicMock()
-            
+
             async def mock_query(prompt, options):
                 yield Message(role=MessageRole.ASSISTANT, content="Module test")
 
@@ -283,7 +289,8 @@ class TestModuleLevelFunctions:
                 messages.append(msg)
 
             assert len(messages) == 1
-            assert len(messages[0].content) == 1 and messages[0].content[0].text == "Module test"
+            assert len(messages[0].content) == 1
+            assert messages[0].content[0].text == "Module test"
             mock_get_client.assert_called_once()
 
     @pytest.mark.asyncio
@@ -291,8 +298,9 @@ class TestModuleLevelFunctions:
         """Test module-level query with options."""
         with patch("claif_gem.client._get_client") as mock_get_client:
             mock_client = MagicMock()
-            
+
             received_options = None
+
             async def mock_query(prompt, options):
                 nonlocal received_options
                 received_options = options

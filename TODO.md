@@ -50,26 +50,6 @@
 - [ ] **Type hint coverage** - 100% type annotations
 - [ ] **Performance profiling** - Basic optimization of critical paths
 
-## SUCCESS CRITERIA FOR v1.0
-
-### Reliability (Must Have)
-- ✅ **99%+ success rate** for subprocess operations
-- ✅ **No resource leaks** in normal operation
-- ✅ **Graceful error handling** with clear messages
-- ✅ **Stable async operations** - Proper cleanup and cancellation
-
-### Testing (Must Have)
-- ✅ **80%+ test coverage** with verified accuracy
-- ✅ **All critical paths tested** including error conditions
-- ✅ **Mocked subprocess dependencies** for reliable testing
-- ✅ **Cross-platform compatibility** verified
-
-### User Experience (Should Have)
-- ✅ **Auto-install works reliably** in clean environments
-- ✅ **Clear error messages** for setup and usage problems
-- ✅ **Windows compatibility** with proper .cmd handling
-- ✅ **Fast startup time** (<3 seconds including CLI detection)
-
 ## NON-GOALS FOR v1.0
 
 Explicitly excluding to maintain focus:

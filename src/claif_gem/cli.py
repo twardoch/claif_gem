@@ -16,15 +16,11 @@ from claif.common import (
     format_response,
     load_config,
 )
+from claif.common.utils import _confirm, _print, _print_error, _print_success, _print_warning, _prompt, process_images
 from loguru import logger
 
 from claif_gem.client import query
 from claif_gem.types import GeminiOptions
-
-
-from claif.common.utils import (
-    _print, _print_error, _print_success, _print_warning, _confirm, _prompt, process_images
-)
 
 
 class GeminiCLI:
@@ -89,7 +85,7 @@ class GeminiCLI:
             no_retry: If True, disables all retry attempts for the query.
         """
         # Initialize image paths to None; it will be populated if 'images' argument is provided.
-        image_paths: List[str] | None = None
+        image_paths: list[str] | None = None
         if images:
             # Process the comma-separated image string into a list of paths.
             image_paths = process_images(images)
@@ -113,7 +109,7 @@ class GeminiCLI:
 
         try:
             # Execute the asynchronous query and collect all messages.
-            messages: List[Message] = asyncio.run(self._query_async(prompt, options))
+            messages: list[Message] = asyncio.run(self._query_async(prompt, options))
 
             # Iterate through the received messages and format/display them.
             for message in messages:
@@ -139,7 +135,7 @@ class GeminiCLI:
                 logger.exception("Full error details for Gemini query failure:")
             sys.exit(1)
 
-    async def _query_async(self, prompt: str, options: GeminiOptions) -> List[Message]:
+    async def _query_async(self, prompt: str, options: GeminiOptions) -> list[Message]:
         """
         Executes an asynchronous Gemini query and collects all messages.
 
@@ -150,7 +146,7 @@ class GeminiCLI:
         Returns:
             A list of Message objects received from the Gemini CLI.
         """
-        messages: List[Message] = []
+        messages: list[Message] = []
         async for message in query(prompt, options):
             messages.append(message)
         return messages
@@ -305,7 +301,7 @@ class GeminiCLI:
         if action == "show":
             _print("Gemini Configuration:")
             # Retrieve Gemini-specific configuration from the loaded config.
-            gemini_config: Union[Dict[str, Any], Any] = self._config.providers.get(Provider.GEMINI, {})
+            gemini_config: dict[str, Any] | Any = self._config.providers.get(Provider.GEMINI, {})
 
             if isinstance(gemini_config, dict):
                 # If the configuration is a dictionary, iterate and print key-value pairs.
@@ -355,13 +351,15 @@ class GeminiCLI:
         from claif_gem.install import install_gemini
 
         _print("Attempting to install Gemini provider...")
-        result: Dict[str, Any] = install_gemini()
+        result: dict[str, Any] = install_gemini()
 
         if result.get("installed"):
             _print_success("Gemini provider installed successfully!")
             _print_success("You can now use the 'gemini' command from anywhere.")
-            _print("\nTo ensure the 'gemini' command is always available, add the installation directory to your system's PATH. For most Unix-like systems, you can add the following line to your shell's profile file (e.g., ~/.bashrc, ~/.zshrc, or ~/.profile):\n")
-            _print(f"  export PATH=\"{result.get('install_dir', '~/.local/bin')}:$PATH\"")
+            _print(
+                "\nTo ensure the 'gemini' command is always available, add the installation directory to your system's PATH. For most Unix-like systems, you can add the following line to your shell's profile file (e.g., ~/.bashrc, ~/.zshrc, or ~/.profile):\n"
+            )
+            _print(f'  export PATH="{result.get("install_dir", "~/.local/bin")}:$PATH"')
             _print("\nAfter adding, run 'source ~/.bashrc' (or your respective profile file) to apply the changes.")
         else:
             error_msg: str = result.get("message", "Unknown installation error.")
@@ -384,7 +382,7 @@ class GeminiCLI:
         from claif_gem.install import uninstall_gemini
 
         _print("Attempting to uninstall Gemini provider...")
-        result: Dict[str, Any] = uninstall_gemini()
+        result: dict[str, Any] = uninstall_gemini()
 
         if result.get("uninstalled"):
             _print_success("Gemini provider uninstalled successfully!")
@@ -437,8 +435,6 @@ class GeminiCLI:
             path_cmd: str = f'export PATH="{install_dir}:$PATH"'
             _print(f"  To add it, run: [cyan]{path_cmd}[/cyan]")
             _print("  (Remember to source your shell's profile file afterwards, e.g., ~/.bashrc or ~/.zshrc)")
-
-    
 
 
 def main():

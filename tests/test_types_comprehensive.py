@@ -1,7 +1,8 @@
 """Comprehensive test suite for claif_gem types."""
 
-import pytest
 from pathlib import Path
+
+import pytest
 from claif.common.types import Message, MessageRole, TextBlock
 
 from claif_gem.types import GeminiMessage, GeminiOptions, GeminiResponse, ResultMessage
@@ -13,7 +14,7 @@ class TestGeminiOptions:
     def test_default_options(self):
         """Test default option values."""
         options = GeminiOptions()
-        
+
         assert options.auto_approve is True
         assert options.yes_mode is True
         assert options.cwd is None
@@ -45,9 +46,9 @@ class TestGeminiOptions:
             images=["/img1.png", "/img2.jpg"],
             retry_count=5,
             retry_delay=2.0,
-            no_retry=True
+            no_retry=True,
         )
-        
+
         assert options.auto_approve is False
         assert options.yes_mode is False
         assert options.cwd == "/tmp/work"
@@ -71,17 +72,13 @@ class TestGeminiOptions:
 
     def test_partial_options(self):
         """Test creating options with only some values specified."""
-        options = GeminiOptions(
-            model="gemini-flash",
-            temperature=0.5,
-            verbose=True
-        )
-        
+        options = GeminiOptions(model="gemini-flash", temperature=0.5, verbose=True)
+
         # Specified values
         assert options.model == "gemini-flash"
         assert options.temperature == 0.5
         assert options.verbose is True
-        
+
         # Defaults for unspecified
         assert options.auto_approve is True
         assert options.yes_mode is True
@@ -94,49 +91,56 @@ class TestGeminiMessage:
     def test_message_creation_defaults(self):
         """Test basic message creation with defaults."""
         msg = GeminiMessage(content="Hello world")
-        assert len(msg.content) == 1 and msg.content[0].text == "Hello world"
+        assert len(msg.content) == 1
+        assert msg.content[0].text == "Hello world"
         assert msg.role == "assistant"
 
     def test_message_creation_custom_role(self):
         """Test message creation with custom role."""
         msg = GeminiMessage(content="User input", role="user")
-        assert len(msg.content) == 1 and msg.content[0].text == "User input"
+        assert len(msg.content) == 1
+        assert msg.content[0].text == "User input"
         assert msg.role == "user"
 
     def test_to_claif_message_assistant(self):
         """Test conversion to Claif message with assistant role."""
         msg = GeminiMessage(content="Assistant response", role="assistant")
         claif_msg = msg.to_claif_message()
-        
+
         assert isinstance(claif_msg, Message)
         assert claif_msg.role == MessageRole.ASSISTANT
-        assert len(claif_msg.content) == 1 and claif_msg.content[0].text == "Assistant response"
+        assert len(claif_msg.content) == 1
+        assert claif_msg.content[0].text == "Assistant response"
 
     def test_to_claif_message_user(self):
         """Test conversion to Claif message with user role."""
         msg = GeminiMessage(content="User query", role="user")
         claif_msg = msg.to_claif_message()
-        
+
         assert isinstance(claif_msg, Message)
         assert claif_msg.role == MessageRole.USER
-        assert len(claif_msg.content) == 1 and claif_msg.content[0].text == "User query"
+        assert len(claif_msg.content) == 1
+        assert claif_msg.content[0].text == "User query"
 
     def test_to_claif_message_unknown_role(self):
         """Test conversion with unknown role defaults to user."""
         msg = GeminiMessage(content="System message", role="system")
         claif_msg = msg.to_claif_message()
-        
+
         # Unknown roles should map to USER
         assert claif_msg.role == MessageRole.USER
-        assert len(claif_msg.content) == 1 and claif_msg.content[0].text == "System message"
+        assert len(claif_msg.content) == 1
+        assert claif_msg.content[0].text == "System message"
 
     def test_empty_content(self):
         """Test message with empty content."""
         msg = GeminiMessage(content="")
-        assert len(msg.content) == 1 and msg.content[0].text == ""
-        
+        assert len(msg.content) == 1
+        assert msg.content[0].text == ""
+
         claif_msg = msg.to_claif_message()
-        assert len(claif_msg.content) == 1 and claif_msg.content[0].text == ""
+        assert len(claif_msg.content) == 1
+        assert claif_msg.content[0].text == ""
 
 
 class TestGeminiResponse:
@@ -145,8 +149,9 @@ class TestGeminiResponse:
     def test_response_creation_minimal(self):
         """Test minimal response creation."""
         response = GeminiResponse(content="Response text")
-        
-        assert len(response.content) == 1 and response.content[0].text == "Response text"
+
+        assert len(response.content) == 1
+        assert response.content[0].text == "Response text"
         assert response.role == "assistant"
         assert response.model is None
         assert response.usage is None
@@ -156,16 +161,13 @@ class TestGeminiResponse:
         """Test full response creation with all fields."""
         usage_data = {"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30}
         raw_data = {"id": "123", "object": "chat.completion", "created": 1234567890}
-        
+
         response = GeminiResponse(
-            content="Full response",
-            role="assistant",
-            model="gemini-pro",
-            usage=usage_data,
-            raw_response=raw_data
+            content="Full response", role="assistant", model="gemini-pro", usage=usage_data, raw_response=raw_data
         )
-        
-        assert len(response.content) == 1 and response.content[0].text == "Full response"
+
+        assert len(response.content) == 1
+        assert response.content[0].text == "Full response"
         assert response.role == "assistant"
         assert response.model == "gemini-pro"
         assert response.usage == usage_data
@@ -173,27 +175,22 @@ class TestGeminiResponse:
 
     def test_to_claif_message_assistant(self):
         """Test conversion to Claif message with assistant role."""
-        response = GeminiResponse(
-            content="Assistant text",
-            role="assistant",
-            model="gemini-pro"
-        )
-        
+        response = GeminiResponse(content="Assistant text", role="assistant", model="gemini-pro")
+
         claif_msg = response.to_claif_message()
         assert isinstance(claif_msg, Message)
         assert claif_msg.role == MessageRole.ASSISTANT
-        assert len(claif_msg.content) == 1 and claif_msg.content[0].text == "Assistant text"
+        assert len(claif_msg.content) == 1
+        assert claif_msg.content[0].text == "Assistant text"
 
     def test_to_claif_message_user(self):
         """Test conversion to Claif message with user role."""
-        response = GeminiResponse(
-            content="User text",
-            role="user"
-        )
-        
+        response = GeminiResponse(content="User text", role="user")
+
         claif_msg = response.to_claif_message()
         assert claif_msg.role == MessageRole.USER
-        assert len(claif_msg.content) == 1 and claif_msg.content[0].text == "User text"
+        assert len(claif_msg.content) == 1
+        assert claif_msg.content[0].text == "User text"
 
     def test_to_claif_message_preserves_content_only(self):
         """Test that conversion only preserves content and role, not metadata."""
@@ -202,13 +199,14 @@ class TestGeminiResponse:
             role="assistant",
             model="gemini-pro",
             usage={"tokens": 100},
-            raw_response={"extra": "data"}
+            raw_response={"extra": "data"},
         )
-        
+
         claif_msg = response.to_claif_message()
         # The Message object should only have role and content
         assert claif_msg.role == MessageRole.ASSISTANT
-        assert len(claif_msg.content) == 1 and claif_msg.content[0].text == "Content only"
+        assert len(claif_msg.content) == 1
+        assert claif_msg.content[0].text == "Content only"
         # Verify it's a simple Message, not containing the extra metadata
         assert not hasattr(claif_msg, "model")
         assert not hasattr(claif_msg, "usage")
@@ -220,7 +218,7 @@ class TestResultMessage:
     def test_result_message_defaults(self):
         """Test default values for ResultMessage."""
         msg = ResultMessage()
-        
+
         assert msg.type == "result"
         assert msg.duration is None
         assert msg.error is False
@@ -229,13 +227,8 @@ class TestResultMessage:
 
     def test_result_message_success(self):
         """Test successful result message."""
-        msg = ResultMessage(
-            duration=1.23,
-            error=False,
-            message="Query completed successfully",
-            session_id="abc-123"
-        )
-        
+        msg = ResultMessage(duration=1.23, error=False, message="Query completed successfully", session_id="abc-123")
+
         assert msg.type == "result"
         assert msg.duration == 1.23
         assert msg.error is False
@@ -244,13 +237,8 @@ class TestResultMessage:
 
     def test_result_message_error(self):
         """Test error result message."""
-        msg = ResultMessage(
-            duration=0.5,
-            error=True,
-            message="API rate limit exceeded",
-            session_id="xyz-789"
-        )
-        
+        msg = ResultMessage(duration=0.5, error=True, message="API rate limit exceeded", session_id="xyz-789")
+
         assert msg.type == "result"
         assert msg.duration == 0.5
         assert msg.error is True
@@ -260,7 +248,7 @@ class TestResultMessage:
     def test_result_message_minimal_error(self):
         """Test minimal error result."""
         msg = ResultMessage(error=True)
-        
+
         assert msg.error is True
         assert msg.duration is None
         assert msg.message is None
@@ -270,7 +258,7 @@ class TestResultMessage:
         msg1 = ResultMessage()
         msg2 = ResultMessage(type="result")
         msg3 = ResultMessage(type="custom")  # Should be allowed but not recommended
-        
+
         assert msg1.type == "result"
         assert msg2.type == "result"
         assert msg3.type == "custom"

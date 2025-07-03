@@ -37,15 +37,15 @@ class GeminiOptions:
 
     auto_approve: bool = True
     yes_mode: bool = True
-    cwd: Optional[Union[str, Path]] = None
-    system_prompt: Optional[str] = None
-    max_context_length: Optional[int] = None
-    temperature: Optional[float] = None
-    model: Optional[str] = None
-    timeout: Optional[int] = None
+    cwd: str | Path | None = None
+    system_prompt: str | None = None
+    max_context_length: int | None = None
+    temperature: float | None = None
+    model: str | None = None
+    timeout: int | None = None
     verbose: bool = False
-    exec_path: Optional[str] = None
-    images: Optional[List[str]] = None
+    exec_path: str | None = None
+    images: list[str] | None = None
     retry_count: int = 3
     retry_delay: float = 1.0
     no_retry: bool = False
@@ -61,7 +61,7 @@ class GeminiMessage:
         role: The role of the sender (e.g., 'assistant', 'user'). Defaults to 'assistant'.
     """
 
-    content: Union[str, List[TextBlock]]
+    content: str | list[TextBlock]
     role: str = "assistant"
 
     def __post_init__(self) -> None:
@@ -108,9 +108,9 @@ class GeminiResponse:
 
     content: str
     role: str = "assistant"
-    model: Optional[str] = None
-    usage: Optional[Dict[str, Any]] = None
-    raw_response: Optional[Dict[str, Any]] = None
+    model: str | None = None
+    usage: dict[str, Any] | None = None
+    raw_response: dict[str, Any] | None = None
 
     def to_claif_message(self) -> Message:
         """
@@ -141,7 +141,7 @@ class ResultMessage:
     """
 
     type: str = "result"
-    duration: Optional[float] = None
+    duration: float | None = None
     error: bool = False
-    message: Optional[str] = None
-    session_id: Optional[str] = None
+    message: str | None = None
+    session_id: str | None = None

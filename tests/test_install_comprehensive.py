@@ -21,12 +21,12 @@ class TestInstallGeminiBundled:
         """Test successful bundled installation."""
         install_dir = Path("/tmp/claif/bin")
         dist_dir = Path("/tmp/dist")
-        
+
         with patch("pathlib.Path.exists", return_value=True):
             with patch("claif_gem.install.shutil.copy2") as mock_copy:
                 with patch("pathlib.Path.chmod") as mock_chmod:
                     result = install_gemini_bundled(install_dir, dist_dir)
-                    
+
                     assert result is True
                     mock_copy.assert_called_once()
                     source, target = mock_copy.call_args[0]
@@ -38,7 +38,7 @@ class TestInstallGeminiBundled:
         """Test when bundled source doesn't exist."""
         install_dir = Path("/tmp/claif/bin")
         dist_dir = Path("/tmp/dist")
-        
+
         with patch("pathlib.Path.exists", return_value=False):
             result = install_gemini_bundled(install_dir, dist_dir)
             assert result is False
@@ -47,7 +47,7 @@ class TestInstallGeminiBundled:
         """Test when copy operation fails."""
         install_dir = Path("/tmp/claif/bin")
         dist_dir = Path("/tmp/dist")
-        
+
         with patch("pathlib.Path.exists", return_value=True):
             with patch("claif_gem.install.shutil.copy2", side_effect=OSError("Permission denied")):
                 result = install_gemini_bundled(install_dir, dist_dir)
@@ -61,9 +61,9 @@ class TestInstallGemini:
     def test_install_bun_failure(self, mock_ensure_bun):
         """Test install when bun installation fails."""
         mock_ensure_bun.return_value = False
-        
+
         result = install_gemini()
-        
+
         assert result["installed"] == []
         assert result["failed"] == ["gemini"]
         assert result["message"] == "bun installation failed"
@@ -76,9 +76,9 @@ class TestInstallGemini:
         mock_ensure_bun.return_value = True
         mock_get_location.return_value = Path("/tmp/claif/bin")
         mock_npm_install.return_value = False
-        
+
         result = install_gemini()
-        
+
         assert result["installed"] == []
         assert result["failed"] == ["gemini"]
         assert result["message"] == "@google-ai/gemini-cli installation failed"
@@ -94,9 +94,9 @@ class TestInstallGemini:
         mock_get_location.return_value = Path("/tmp/claif/bin")
         mock_npm_install.return_value = True
         mock_bundle.return_value = None  # Bundling failed
-        
+
         result = install_gemini()
-        
+
         assert result["installed"] == []
         assert result["failed"] == ["gemini"]
         assert result["message"] == "bundling failed"
@@ -107,34 +107,32 @@ class TestInstallGemini:
     @patch("claif_gem.install.bundle_all_tools")
     @patch("claif_gem.install.install_gemini_bundled")
     @patch("claif_gem.install.prompt_tool_configuration")
-    def test_install_success(self, mock_prompt, mock_install_bundled, mock_bundle, 
-                           mock_npm_install, mock_get_location, mock_ensure_bun):
+    def test_install_success(
+        self, mock_prompt, mock_install_bundled, mock_bundle, mock_npm_install, mock_get_location, mock_ensure_bun
+    ):
         """Test successful installation."""
         mock_ensure_bun.return_value = True
         mock_get_location.return_value = Path("/tmp/claif/bin")
         mock_npm_install.return_value = True
         mock_bundle.return_value = Path("/tmp/dist")
         mock_install_bundled.return_value = True
-        
+
         result = install_gemini()
-        
+
         assert result["installed"] == ["gemini"]
         assert result["failed"] == []
-        
+
         # Verify calls
         mock_npm_install.assert_called_once_with("@google-ai/gemini-cli")
         mock_bundle.assert_called_once()
-        mock_install_bundled.assert_called_once_with(
-            Path("/tmp/claif/bin"),
-            Path("/tmp/dist")
-        )
+        mock_install_bundled.assert_called_once_with(Path("/tmp/claif/bin"), Path("/tmp/dist"))
         mock_prompt.assert_called_once_with(
             "Gemini",
             [
                 "gemini auth login",
                 "gemini config set --api-key YOUR_API_KEY",
                 "gemini --help",
-            ]
+            ],
         )
 
     @patch("claif_gem.install.ensure_bun_installed")
@@ -142,17 +140,18 @@ class TestInstallGemini:
     @patch("claif_gem.install.install_npm_package_globally")
     @patch("claif_gem.install.bundle_all_tools")
     @patch("claif_gem.install.install_gemini_bundled")
-    def test_install_bundled_failure(self, mock_install_bundled, mock_bundle, 
-                                   mock_npm_install, mock_get_location, mock_ensure_bun):
+    def test_install_bundled_failure(
+        self, mock_install_bundled, mock_bundle, mock_npm_install, mock_get_location, mock_ensure_bun
+    ):
         """Test when bundled installation fails."""
         mock_ensure_bun.return_value = True
         mock_get_location.return_value = Path("/tmp/claif/bin")
         mock_npm_install.return_value = True
         mock_bundle.return_value = Path("/tmp/dist")
         mock_install_bundled.return_value = False
-        
+
         result = install_gemini()
-        
+
         assert result["installed"] == []
         assert result["failed"] == ["gemini"]
         assert result["message"] == "gemini installation failed"
@@ -165,9 +164,9 @@ class TestUninstallGemini:
     def test_uninstall_success(self, mock_uninstall):
         """Test successful uninstallation."""
         mock_uninstall.return_value = True
-        
+
         result = uninstall_gemini()
-        
+
         assert result["uninstalled"] == ["gemini"]
         assert result["failed"] == []
         mock_uninstall.assert_called_once_with("gemini")
@@ -176,9 +175,9 @@ class TestUninstallGemini:
     def test_uninstall_failure(self, mock_uninstall):
         """Test failed uninstallation."""
         mock_uninstall.return_value = False
-        
+
         result = uninstall_gemini()
-        
+
         assert result["uninstalled"] == []
         assert result["failed"] == ["gemini"]
         assert result["message"] == "gemini uninstallation failed"
@@ -192,20 +191,19 @@ class TestIsGeminiInstalled:
         """Test when gemini is installed as a file."""
         install_dir = Path("/tmp/claif/bin")
         mock_get_location.return_value = install_dir
-        
-        with patch("pathlib.Path.exists") as mock_exists:
-            with patch("pathlib.Path.is_file") as mock_is_file:
-                mock_exists.return_value = True
-                mock_is_file.return_value = True
-                
-                assert is_gemini_installed() is True
+
+        with patch("pathlib.Path.exists") as mock_exists, patch("pathlib.Path.is_file") as mock_is_file:
+            mock_exists.return_value = True
+            mock_is_file.return_value = True
+
+            assert is_gemini_installed() is True
 
     @patch("claif_gem.install.get_install_location")
     def test_installed_as_directory(self, mock_get_location):
         """Test when gemini is installed as a directory."""
         install_dir = Path("/tmp/claif/bin")
         mock_get_location.return_value = install_dir
-        
+
         # First exists() check returns False (not a file), second returns True (is a dir)
         with patch("pathlib.Path.exists", side_effect=[False, True]):
             with patch("pathlib.Path.is_dir", return_value=True):
@@ -216,7 +214,7 @@ class TestIsGeminiInstalled:
         """Test when gemini is not installed."""
         install_dir = Path("/tmp/claif/bin")
         mock_get_location.return_value = install_dir
-        
+
         with patch("pathlib.Path.exists", return_value=False):
             assert is_gemini_installed() is False
 
@@ -230,9 +228,9 @@ class TestGetGeminiStatus:
         """Test status when gemini is installed."""
         mock_is_installed.return_value = True
         mock_get_location.return_value = Path("/home/user/.claif/bin")
-        
+
         status = get_gemini_status()
-        
+
         assert status["installed"] is True
         assert status["path"] == "/home/user/.claif/bin/gemini"
         assert status["type"] == "bundled (claif-owned)"
@@ -241,9 +239,9 @@ class TestGetGeminiStatus:
     def test_status_not_installed(self, mock_is_installed):
         """Test status when gemini is not installed."""
         mock_is_installed.return_value = False
-        
+
         status = get_gemini_status()
-        
+
         assert status["installed"] is False
         assert status["path"] is None
         assert status["type"] is None

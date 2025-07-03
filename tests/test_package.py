@@ -1,18 +1,19 @@
 # this_file: tests/test_package.py
 """Test suite for claif_gem."""
 
-import claif_gem
-import pytest
 from unittest.mock import patch
 
-from claif_gem.transport import GeminiTransport
-from claif_gem.types import (
-    GeminiOptions,
-    GeminiMessage,
-    ResultMessage,
-)
+import pytest
 from claif.common import TransportError
 from claif.common.types import TextBlock
+
+import claif_gem
+from claif_gem.transport import GeminiTransport
+from claif_gem.types import (
+    GeminiMessage,
+    GeminiOptions,
+    ResultMessage,
+)
 
 
 def test_version():
@@ -113,7 +114,8 @@ class TestGeminiTransport:
         results = [result async for result in transport.send_query("test", GeminiOptions(retry_count=0))]
 
         assert len(results) == 2
-        assert len(results[0].content) == 1 and results[0].content[0].text == "response"
+        assert len(results[0].content) == 1
+        assert results[0].content[0].text == "response"
         assert not results[1].error
         mock_execute_query.assert_called_once()
 
@@ -122,7 +124,8 @@ class TestGeminiTransport:
 
         # First call fails, second succeeds
         async def first_call_results():
-            raise TransportError("mocked error")
+            msg = "mocked error"
+            raise TransportError(msg)
             yield  # This makes it an async generator
 
         async def second_call_results():
@@ -139,13 +142,15 @@ class TestGeminiTransport:
 
         assert mock_execute_query.call_count == 2
         assert len(results) == 2
-        assert len(results[0].content) == 1 and results[0].content[0].text == "response"
+        assert len(results[0].content) == 1
+        assert results[0].content[0].text == "response"
 
     async def test_send_query_all_retries_fail(self, transport, mocker):
         """Test send_query when all retry attempts fail."""
 
         async def mock_failure():
-            raise TransportError("mocked error")
+            msg = "mocked error"
+            raise TransportError(msg)
             yield
 
         mock_execute_query = mocker.patch.object(transport, "_execute_query", return_value=mock_failure())

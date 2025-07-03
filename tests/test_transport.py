@@ -1,31 +1,34 @@
-
 # this_file: claif_gem/tests/test_transport.py
 """Tests for the Gemini transport layer."""
 
 import asyncio
-import pytest
 from unittest.mock import AsyncMock, patch
 
-from claif_gem.transport import GeminiTransport
-from claif_gem.types import GeminiOptions, GeminiMessage, ResultMessage
+import pytest
 from claif.common.types import TextBlock
+
+from claif_gem.transport import GeminiTransport
+from claif_gem.types import GeminiMessage, GeminiOptions, ResultMessage
+
 
 @pytest.fixture
 def mock_subprocess_exec():
     """Fixture to mock asyncio.create_subprocess_exec."""
-    with patch('asyncio.create_subprocess_exec') as mock_exec:
+    with patch("asyncio.create_subprocess_exec") as mock_exec:
         mock_process = AsyncMock()
         mock_process.returncode = 0
-        mock_process.communicate.return_value = (b'{"content": "test response"}', b'')
+        mock_process.communicate.return_value = (b'{"content": "test response"}', b"")
         mock_exec.return_value = mock_process
         yield mock_exec
+
 
 @pytest.fixture
 def mock_find_executable():
     """Fixture to mock find_executable."""
-    with patch('claif_gem.transport.find_executable') as mock_find:
-        mock_find.return_value = '/usr/local/bin/gemini'
+    with patch("claif_gem.transport.find_executable") as mock_find:
+        mock_find.return_value = "/usr/local/bin/gemini"
         yield mock_find
+
 
 @pytest.mark.asyncio
 async def test_send_query_success(mock_subprocess_exec, mock_find_executable):
@@ -39,16 +42,18 @@ async def test_send_query_success(mock_subprocess_exec, mock_find_executable):
     # Assert that create_subprocess_exec was called with the correct command
     mock_subprocess_exec.assert_called_once()
     called_command = mock_subprocess_exec.call_args[0][0]
-    assert called_command[0] == '/usr/local/bin/gemini'
-    assert '-p' in called_command
+    assert called_command[0] == "/usr/local/bin/gemini"
+    assert "-p" in called_command
     assert prompt in called_command
 
     # Assert the messages received
     assert len(messages) == 2
     assert isinstance(messages[0], GeminiMessage)
-    assert len(messages[0].content) == 1 and messages[0].content[0].text == "test response"
+    assert len(messages[0].content) == 1
+    assert messages[0].content[0].text == "test response"
     assert isinstance(messages[1], ResultMessage)
     assert not messages[1].error
+
 
 @pytest.mark.asyncio
 async def test_build_command_verbose():
@@ -58,7 +63,8 @@ async def test_build_command_verbose():
     prompt = "test prompt"
 
     command = transport._build_command(prompt, options)
-    assert '-d' in command
+    assert "-d" in command
+
 
 @pytest.mark.asyncio
 async def test_build_command_model():
@@ -68,8 +74,9 @@ async def test_build_command_model():
     prompt = "test prompt"
 
     command = transport._build_command(prompt, options)
-    assert '-m' in command
-    assert 'gemini-pro' in command
+    assert "-m" in command
+    assert "gemini-pro" in command
+
 
 @pytest.mark.asyncio
 async def test_build_command_temperature():
@@ -79,8 +86,9 @@ async def test_build_command_temperature():
     prompt = "test prompt"
 
     command = transport._build_command(prompt, options)
-    assert '-t' in command
-    assert '0.5' in command
+    assert "-t" in command
+    assert "0.5" in command
+
 
 @pytest.mark.asyncio
 async def test_build_command_system_prompt():
@@ -90,8 +98,9 @@ async def test_build_command_system_prompt():
     prompt = "test prompt"
 
     command = transport._build_command(prompt, options)
-    assert '-s' in command
-    assert 'You are a helpful assistant.' in command
+    assert "-s" in command
+    assert "You are a helpful assistant." in command
+
 
 @pytest.mark.asyncio
 async def test_build_command_max_context_length():
@@ -101,8 +110,9 @@ async def test_build_command_max_context_length():
     prompt = "test prompt"
 
     command = transport._build_command(prompt, options)
-    assert '--max-context' in command
-    assert '1024' in command
+    assert "--max-context" in command
+    assert "1024" in command
+
 
 @pytest.mark.asyncio
 async def test_build_command_auto_approve():
@@ -112,7 +122,8 @@ async def test_build_command_auto_approve():
     prompt = "test prompt"
 
     command = transport._build_command(prompt, options)
-    assert '-y' in command
+    assert "-y" in command
+
 
 @pytest.mark.asyncio
 async def test_build_command_yes_mode():
@@ -122,7 +133,8 @@ async def test_build_command_yes_mode():
     prompt = "test prompt"
 
     command = transport._build_command(prompt, options)
-    assert '-y' in command
+    assert "-y" in command
+
 
 @pytest.mark.asyncio
 async def test_send_query_cli_error(mock_subprocess_exec, mock_find_executable):
@@ -132,7 +144,7 @@ async def test_send_query_cli_error(mock_subprocess_exec, mock_find_executable):
     prompt = "test prompt"
 
     mock_subprocess_exec.return_value.returncode = 1
-    mock_subprocess_exec.return_value.communicate.return_value = (b'', b'CLI error message')
+    mock_subprocess_exec.return_value.communicate.return_value = (b"", b"CLI error message")
 
     messages = [msg async for msg in transport.send_query(prompt, options)]
 
@@ -141,6 +153,7 @@ async def test_send_query_cli_error(mock_subprocess_exec, mock_find_executable):
     assert messages[0].error
     assert "CLI error message" in messages[0].message
 
+
 @pytest.mark.asyncio
 async def test_send_query_json_decode_error(mock_subprocess_exec, mock_find_executable):
     """Test send_query with invalid JSON output."""
@@ -148,15 +161,17 @@ async def test_send_query_json_decode_error(mock_subprocess_exec, mock_find_exec
     options = GeminiOptions()
     prompt = "test prompt"
 
-    mock_subprocess_exec.return_value.communicate.return_value = (b'invalid json', b'')
+    mock_subprocess_exec.return_value.communicate.return_value = (b"invalid json", b"")
 
     messages = [msg async for msg in transport.send_query(prompt, options)]
 
     assert len(messages) == 2
     assert isinstance(messages[0], GeminiMessage)
-    assert len(messages[0].content) == 1 and messages[0].content[0].text == "invalid json"
+    assert len(messages[0].content) == 1
+    assert messages[0].content[0].text == "invalid json"
     assert isinstance(messages[1], ResultMessage)
     assert not messages[1].error
+
 
 @pytest.mark.asyncio
 async def test_disconnect_terminates_process():

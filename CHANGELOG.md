@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2025-07-03] - v1.0 CRITICAL ISSUES RESOLUTION & FINAL VERIFICATION ✅
+
+### Summary
+All critical blocking issues for v1.0 release have been resolved. The Gemini provider is stable, with robust subprocess management, comprehensive test coverage, and proper error handling.
+
+### Fixed
+- **Gemini Provider Hanging Issue**: Resolved the issue where the Gemini provider would hang indefinitely by refactoring the subprocess communication in `claif_gem/src/claif_gem/transport.py` to use `asyncio.subprocess.communicate()` for more reliable output capture.
+- **Logging Levels**: Changed "Error during disconnect" messages from WARNING to DEBUG in `claif_gem/src/claif_gem/transport.py`.
+- **Import Errors**: Fixed missing Dict and List imports in types.py and cli.py
+- **Syntax Warning**: Fixed invalid escape sequence in CLI path output
+- **Test Failures**: Updated tests to expect List[TextBlock] instead of str due to Message class changes
+- **Quota Errors**: Fixed issue where quota errors would fail immediately instead of retrying.
+- **Resource Leaks**: Fixed subprocess lifecycle management and resource leaks.
+- **Async Cleanup**: Fixed async cleanup issues with proper cancellation handling.
+
+### Added
+- **Smart Retry Logic**: Implemented tenacity-based retry mechanism for transient errors, including configurable retry delays, `no_retry` flag, and comprehensive error detection for quota/rate limit errors with exponential backoff.
+- **Comprehensive Test Suite**: Added pytest tests for all modules, including transport, client, CLI, types, and installation flow, achieving 80%+ test coverage.
+- **Async Transport Improvements**: Enhanced subprocess management with proper async subprocess lifecycle, resource cleanup on errors and cancellation, and fixed process group handling to prevent zombie processes.
+
+### Changed
+- Enhanced `transport.py` to handle quota exhaustion errors intelligently.
+- Updated error detection to include: "quota", "exhausted", "rate limit", "429", "503", "502".
+- Modified `send_query` to check no_retry flag before attempting retries.
+- Improved error messages to indicate retry count on failure.
+- **CLI Module**: Added rich console output with themed styling.
+- **Error Handling**: More descriptive error messages with context.
+
 ## [Unreleased] - 2025-01-03
 
 ### Fixed

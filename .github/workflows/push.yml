@@ -44,8 +44,8 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
-        os: [ubuntu-latest]
-      fail-fast: true
+        os: [ubuntu-latest, windows-latest, macos-latest]
+      fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
@@ -69,8 +69,14 @@ jobs:
           uv pip install --system --upgrade pip
           uv pip install --system ".[test]"
 
-      - name: Run tests with Pytest
-        run: uv run pytest -n auto --maxfail=1 --disable-warnings --cov-report=xml --cov-config=pyproject.toml --cov=src/claif_gem --cov=tests tests/
+      - name: Run tests with Hatch (Unix)
+        if: runner.os != 'Windows'
+        run: uvx hatch test
+
+      - name: Run tests with Hatch (Windows)
+        if: runner.os == 'Windows'
+        run: uvx hatch test
+        shell: cmd
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
