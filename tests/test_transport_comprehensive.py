@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import pytest
-from claif.common import TransportError
+from claif.common.types import TransportError, TextBlock
 from tenacity import RetryError
 
 from claif_gem.transport import GeminiTransport
@@ -191,8 +191,9 @@ class TestGeminiTransport:
             messages.append(msg)
         
         assert len(messages) == 2
-        assert isinstance(messages[0], GeminiMessage)
-        assert messages[0].content == "Hello from Gemini"
+        assert len(isinstance(messages[0], GeminiMessage)
+        assert messages[0].content) == 1 and isinstance(messages[0], GeminiMessage)
+        assert messages[0].content[0].text == "Hello from Gemini"
         assert messages[0].role == "assistant"
         assert isinstance(messages[1], ResultMessage)
         assert messages[1].error is False
@@ -217,8 +218,9 @@ class TestGeminiTransport:
             messages.append(msg)
         
         assert len(messages) == 2
-        assert isinstance(messages[0], GeminiMessage)
-        assert messages[0].content == "Plain text response from Gemini"
+        assert len(isinstance(messages[0], GeminiMessage)
+        assert messages[0].content) == 1 and isinstance(messages[0], GeminiMessage)
+        assert messages[0].content[0].text == "Plain text response from Gemini"
         assert isinstance(messages[1], ResultMessage)
 
     @pytest.mark.asyncio
@@ -325,7 +327,7 @@ class TestGeminiTransport:
             
             assert call_count == 2
             assert len(messages) == 2
-            assert messages[0].content == "Success"
+            assert len(messages[0].content) == 1 and messages[0].content[0].text == "Success"
 
     @pytest.mark.asyncio
     async def test_send_query_all_retries_fail(self, transport):

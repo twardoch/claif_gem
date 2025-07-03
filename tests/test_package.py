@@ -11,7 +11,7 @@ from claif_gem.types import (
     GeminiMessage,
     ResultMessage,
 )
-from claif.common import TransportError
+from claif.common.types import TransportError, TextBlock
 
 
 def test_version():
@@ -112,7 +112,7 @@ class TestGeminiTransport:
         results = [result async for result in transport.send_query("test", GeminiOptions(retry_count=0))]
 
         assert len(results) == 2
-        assert results[0].content == "response"
+        assert len(results[0].content) == 1 and results[0].content[0].text == "response"
         assert not results[1].error
         mock_execute_query.assert_called_once()
 
@@ -138,7 +138,7 @@ class TestGeminiTransport:
 
         assert mock_execute_query.call_count == 2
         assert len(results) == 2
-        assert results[0].content == "response"
+        assert len(results[0].content) == 1 and results[0].content[0].text == "response"
 
     async def test_send_query_all_retries_fail(self, transport, mocker):
         """Test send_query when all retry attempts fail."""

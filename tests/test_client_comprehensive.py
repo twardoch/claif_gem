@@ -3,7 +3,7 @@
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import pytest
-from claif.common import Message, MessageRole
+from claif.common.types import Message, MessageRole, TextBlock
 
 from claif_gem.client import GeminiClient, _get_client, _is_cli_missing_error, query
 from claif_gem.types import GeminiMessage, GeminiOptions, ResultMessage
@@ -66,8 +66,9 @@ class TestGeminiClient:
             messages.append(msg)
 
         assert len(messages) == 1
-        assert isinstance(messages[0], Message)
-        assert messages[0].content == "Hello from Gemini"
+        assert len(isinstance(messages[0], Message)
+        assert messages[0].content) == 1 and isinstance(messages[0], Message)
+        assert messages[0].content[0].text == "Hello from Gemini"
         assert messages[0].role == MessageRole.ASSISTANT
 
         mock_transport.connect.assert_called_once()
@@ -93,7 +94,7 @@ class TestGeminiClient:
             messages.append(msg)
 
         assert len(messages) == 1
-        assert messages[0].content == "Response"
+        assert len(messages[0].content) == 1 and messages[0].content[0].text == "Response"
 
     @pytest.mark.asyncio
     async def test_query_with_error_result(self, client, mock_transport):
@@ -169,7 +170,7 @@ class TestGeminiClient:
                     messages.append(msg)
 
                 assert len(messages) == 1
-                assert messages[0].content == "Success after install"
+                assert len(messages[0].content) == 1 and messages[0].content[0].text == "Success after install"
                 mock_install.assert_called_once()
                 retry_transport.connect.assert_called_once()
                 retry_transport.disconnect.assert_called_once()
@@ -283,7 +284,7 @@ class TestModuleLevelFunctions:
                 messages.append(msg)
 
             assert len(messages) == 1
-            assert messages[0].content == "Module test"
+            assert len(messages[0].content) == 1 and messages[0].content[0].text == "Module test"
             mock_get_client.assert_called_once()
 
     @pytest.mark.asyncio

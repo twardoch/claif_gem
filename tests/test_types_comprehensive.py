@@ -2,7 +2,7 @@
 
 import pytest
 from pathlib import Path
-from claif.common import Message, MessageRole
+from claif.common.types import Message, MessageRole, TextBlock
 
 from claif_gem.types import GeminiMessage, GeminiOptions, GeminiResponse, ResultMessage
 
@@ -94,13 +94,13 @@ class TestGeminiMessage:
     def test_message_creation_defaults(self):
         """Test basic message creation with defaults."""
         msg = GeminiMessage(content="Hello world")
-        assert msg.content == "Hello world"
+        assert len(msg.content) == 1 and msg.content[0].text == "Hello world"
         assert msg.role == "assistant"
 
     def test_message_creation_custom_role(self):
         """Test message creation with custom role."""
         msg = GeminiMessage(content="User input", role="user")
-        assert msg.content == "User input"
+        assert len(msg.content) == 1 and msg.content[0].text == "User input"
         assert msg.role == "user"
 
     def test_to_claif_message_assistant(self):
@@ -110,7 +110,7 @@ class TestGeminiMessage:
         
         assert isinstance(claif_msg, Message)
         assert claif_msg.role == MessageRole.ASSISTANT
-        assert claif_msg.content == "Assistant response"
+        assert len(claif_msg.content) == 1 and claif_msg.content[0].text == "Assistant response"
 
     def test_to_claif_message_user(self):
         """Test conversion to Claif message with user role."""
@@ -119,7 +119,7 @@ class TestGeminiMessage:
         
         assert isinstance(claif_msg, Message)
         assert claif_msg.role == MessageRole.USER
-        assert claif_msg.content == "User query"
+        assert len(claif_msg.content) == 1 and claif_msg.content[0].text == "User query"
 
     def test_to_claif_message_unknown_role(self):
         """Test conversion with unknown role defaults to user."""
@@ -128,15 +128,15 @@ class TestGeminiMessage:
         
         # Unknown roles should map to USER
         assert claif_msg.role == MessageRole.USER
-        assert claif_msg.content == "System message"
+        assert len(claif_msg.content) == 1 and claif_msg.content[0].text == "System message"
 
     def test_empty_content(self):
         """Test message with empty content."""
         msg = GeminiMessage(content="")
-        assert msg.content == ""
+        assert len(msg.content) == 1 and msg.content[0].text == ""
         
         claif_msg = msg.to_claif_message()
-        assert claif_msg.content == ""
+        assert len(claif_msg.content) == 1 and claif_msg.content[0].text == ""
 
 
 class TestGeminiResponse:
@@ -146,7 +146,7 @@ class TestGeminiResponse:
         """Test minimal response creation."""
         response = GeminiResponse(content="Response text")
         
-        assert response.content == "Response text"
+        assert len(response.content) == 1 and response.content[0].text == "Response text"
         assert response.role == "assistant"
         assert response.model is None
         assert response.usage is None
@@ -165,7 +165,7 @@ class TestGeminiResponse:
             raw_response=raw_data
         )
         
-        assert response.content == "Full response"
+        assert len(response.content) == 1 and response.content[0].text == "Full response"
         assert response.role == "assistant"
         assert response.model == "gemini-pro"
         assert response.usage == usage_data
@@ -182,7 +182,7 @@ class TestGeminiResponse:
         claif_msg = response.to_claif_message()
         assert isinstance(claif_msg, Message)
         assert claif_msg.role == MessageRole.ASSISTANT
-        assert claif_msg.content == "Assistant text"
+        assert len(claif_msg.content) == 1 and claif_msg.content[0].text == "Assistant text"
 
     def test_to_claif_message_user(self):
         """Test conversion to Claif message with user role."""
@@ -193,7 +193,7 @@ class TestGeminiResponse:
         
         claif_msg = response.to_claif_message()
         assert claif_msg.role == MessageRole.USER
-        assert claif_msg.content == "User text"
+        assert len(claif_msg.content) == 1 and claif_msg.content[0].text == "User text"
 
     def test_to_claif_message_preserves_content_only(self):
         """Test that conversion only preserves content and role, not metadata."""
@@ -208,7 +208,7 @@ class TestGeminiResponse:
         claif_msg = response.to_claif_message()
         # The Message object should only have role and content
         assert claif_msg.role == MessageRole.ASSISTANT
-        assert claif_msg.content == "Content only"
+        assert len(claif_msg.content) == 1 and claif_msg.content[0].text == "Content only"
         # Verify it's a simple Message, not containing the extra metadata
         assert not hasattr(claif_msg, "model")
         assert not hasattr(claif_msg, "usage")

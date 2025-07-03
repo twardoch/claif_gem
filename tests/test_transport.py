@@ -8,6 +8,7 @@ from unittest.mock import AsyncMock, patch
 
 from claif_gem.transport import GeminiTransport
 from claif_gem.types import GeminiOptions, GeminiMessage, ResultMessage
+from claif.common.types import TextBlock
 
 @pytest.fixture
 def mock_subprocess_exec():
@@ -45,7 +46,7 @@ async def test_send_query_success(mock_subprocess_exec, mock_find_executable):
     # Assert the messages received
     assert len(messages) == 2
     assert isinstance(messages[0], GeminiMessage)
-    assert messages[0].content == "test response"
+    assert len(messages[0].content) == 1 and messages[0].content[0].text == "test response"
     assert isinstance(messages[1], ResultMessage)
     assert not messages[1].error
 
@@ -153,7 +154,7 @@ async def test_send_query_json_decode_error(mock_subprocess_exec, mock_find_exec
 
     assert len(messages) == 2
     assert isinstance(messages[0], GeminiMessage)
-    assert messages[0].content == "invalid json"
+    assert len(messages[0].content) == 1 and messages[0].content[0].text == "invalid json"
     assert isinstance(messages[1], ResultMessage)
     assert not messages[1].error
 

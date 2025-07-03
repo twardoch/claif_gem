@@ -6,7 +6,7 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from claif_gem.transport import GeminiTransport
 from claif_gem.types import GeminiOptions, ResultMessage, GeminiMessage
-from claif.common import TransportError
+from claif.common.types import TransportError, TextBlock
 
 
 @pytest.mark.asyncio
@@ -39,8 +39,9 @@ async def test_retry_on_quota_exhausted():
         
         # Should have retried and succeeded
         assert len(messages) == 2
-        assert isinstance(messages[0], GeminiMessage)
-        assert messages[0].content == "Test response"
+        assert len(isinstance(messages[0], GeminiMessage)
+        assert messages[0].content) == 1 and isinstance(messages[0], GeminiMessage)
+        assert messages[0].content[0].text == "Test response"
         assert isinstance(messages[1], ResultMessage)
         assert not messages[1].error
 
@@ -72,7 +73,7 @@ async def test_retry_on_rate_limit():
             messages.append(msg)
         
         assert len(messages) == 2
-        assert messages[0].content == "Success"
+        assert len(messages[0].content) == 1 and messages[0].content[0].text == "Success"
 
 
 @pytest.mark.asyncio
