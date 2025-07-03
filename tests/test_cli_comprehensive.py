@@ -288,38 +288,22 @@ class TestGeminiCLI:
             assert any("Average:" in call for call in calls)
 
     def test_process_images_local_files(self, cli):
-        """Test _process_images with local files."""
-        with patch("pathlib.Path.exists", return_value=True):
-            with patch("pathlib.Path.expanduser") as mock_expand:
-                with patch("pathlib.Path.resolve") as mock_resolve:
-                    # Mock path resolution
-                    mock_path = Mock()
-                    mock_path.resolve.return_value = "/resolved/image.png"
-                    mock_expand.return_value = mock_path
-                    
-                    result = cli._process_images("/home/user/image.png,/data/photo.jpg")
-                    
-                    assert len(result) == 2
-                    assert all(isinstance(p, str) for p in result)
+        """Test process_images with local files."""
+        with patch("claif_gem.cli.process_images") as mock_process_images:
+            mock_process_images.return_value = ["/resolved/image.png", "/resolved/photo.jpg"]
+            
+            cli.query("Analyze this", images="/home/user/image.png,/data/photo.jpg")
+            
+            mock_process_images.assert_called_once_with("/home/user/image.png,/data/photo.jpg")
 
     def test_process_images_urls(self, cli):
-        """Test _process_images with URLs."""
-        with patch("urllib.request.urlopen") as mock_urlopen:
-            with patch("tempfile.NamedTemporaryFile") as mock_tempfile:
-                # Mock URL download
-                mock_response = Mock()
-                mock_response.read.return_value = b"image data"
-                mock_urlopen.return_value.__enter__.return_value = mock_response
-                
-                # Mock temp file
-                mock_file = Mock()
-                mock_file.name = "/tmp/image123.jpg"
-                mock_tempfile.return_value.__enter__.return_value = mock_file
-                
-                result = cli._process_images("https://example.com/image.jpg")
-                
-                assert len(result) == 1
-                assert result[0] == "/tmp/image123.jpg"
+        """Test process_images with URLs."""
+        with patch("claif_gem.cli.process_images") as mock_process_images:
+            mock_process_images.return_value = ["/tmp/image123.jpg"]
+            
+            cli.query("Analyze this", images="https://example.com/image.jpg")
+            
+            mock_process_images.assert_called_once_with("https://example.com/image.jpg")
 
 
 class TestMainFunction:

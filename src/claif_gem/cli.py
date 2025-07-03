@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Union
 
 import fire
 from claif.common import (
+    Message,
     Provider,
     ResponseMetrics,
     format_metrics,
