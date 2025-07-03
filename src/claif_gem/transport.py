@@ -254,7 +254,7 @@ class GeminiTransport:
                 stderr_task.cancel()
                 
                 # Force kill the process if it times out
-                logger.warning(f"Gemini process timed out after {timeout_seconds}s, terminating")
+                logger.debug(f"Gemini process timed out after {timeout_seconds}s, terminating")
                 if os.name != 'nt':
                     try:
                         os.killpg(os.getpgid(process.pid), signal.SIGKILL)
