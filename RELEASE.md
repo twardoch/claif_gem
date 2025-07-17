@@ -124,6 +124,8 @@ After pushing the tag, GitHub Actions will:
 
 ## GitHub Actions
 
+**⚠️ Important**: Due to GitHub App permissions, the workflow files need to be manually set up. See `GITHUB_WORKFLOWS_SETUP.md` for detailed instructions.
+
 ### CI Workflow (`.github/workflows/ci.yml`)
 - **Triggers**: Push to main, PRs
 - **Platforms**: Ubuntu, Windows, macOS
@@ -138,6 +140,12 @@ After pushing the tag, GitHub Actions will:
 - **Triggers**: Git tags, manual dispatch, after release
 - **Platforms**: Linux, Windows, macOS
 - **Output**: Standalone executables via PyInstaller
+
+### Setup Instructions
+1. Create `.github/workflows/` directory
+2. Copy workflow files from `github-workflows/` directory
+3. Set up required GitHub secrets (PYPI_TOKEN, TEST_PYPI_TOKEN)
+4. Test workflows with a pull request
 
 ## Binary Builds
 

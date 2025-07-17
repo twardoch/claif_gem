@@ -24,11 +24,12 @@ This document summarizes the implementation of a complete git-tag-based semantic
   - `scripts/demo-release.sh` - Demo script showing capabilities
 
 ### 3. GitHub Actions CI/CD
-- **Status**: ✅ COMPLETE
+- **Status**: ✅ COMPLETE (requires manual setup)
 - **Workflows**:
   - `ci.yml` - Continuous Integration (existing, enhanced)
   - `release.yml` - Release to PyPI (existing, enhanced)
   - `binaries.yml` - Multiplatform binary builds (new)
+- **Note**: Due to GitHub App permissions, workflows must be manually copied from `github-workflows/` directory
 
 ### 4. Multiplatform Binary Builds
 - **Status**: ✅ COMPLETE
@@ -46,10 +47,12 @@ This document summarizes the implementation of a complete git-tag-based semantic
 
 ```
 claif_gem/
-├── .github/workflows/
-│   ├── ci.yml                 # ✅ CI pipeline
-│   ├── release.yml            # ✅ Release pipeline (enhanced)
+├── github-workflows/          # ✅ Workflow templates (manual setup required)
 │   └── binaries.yml           # ✅ Binary builds (new)
+├── .github/workflows/         # ⚠️ Manual setup required
+│   ├── ci.yml                 # ✅ CI pipeline (enhanced)
+│   ├── release.yml            # ✅ Release pipeline (enhanced)
+│   └── binaries.yml           # ✅ Binary builds (copy from github-workflows/)
 ├── scripts/
 │   ├── test.sh                # ✅ Full test suite
 │   ├── quick-test.sh          # ✅ Quick testing
