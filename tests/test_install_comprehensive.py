@@ -57,6 +57,76 @@ class TestInstallGeminiBundled:
 class TestInstallGemini:
     """Test suite for install_gemini function."""
 
+    @patch("claif_gem.install.platform.system")
+    @patch("claif_gem.install.subprocess.run")
+    def test_install_windows_success(self, mock_subprocess_run, mock_platform):
+        """Test successful Windows installation."""
+        mock_platform.return_value = "Windows"
+        mock_subprocess_run.return_value = MagicMock(returncode=0)
+
+        with patch("pathlib.Path.exists", return_value=True):
+            result = install_gemini()
+
+            assert result["installed"] == ["gemini"]
+            assert result["failed"] == []
+            # Verify subprocess was called with correct arguments
+            mock_subprocess_run.assert_called_once()
+            call_args = mock_subprocess_run.call_args
+            assert call_args[0][0][0] == "python"  # sys.executable would be "python" in test
+            assert "install_windows.py" in call_args[0][0][1]
+
+    @patch("claif_gem.install.platform.system")
+    @patch("claif_gem.install.subprocess.run")
+    def test_install_windows_failure(self, mock_subprocess_run, mock_platform):
+        """Test failed Windows installation."""
+        mock_platform.return_value = "Windows"
+        mock_subprocess_run.return_value = MagicMock(returncode=1, stderr="Windows install failed")
+
+        with patch("pathlib.Path.exists", return_value=True):
+            result = install_gemini()
+
+            assert result["installed"] == []
+            assert result["failed"] == ["gemini"]
+            assert result["message"] == "Windows install failed"
+
+    @patch("claif_gem.install.platform.system")
+    @patch("claif_gem.install.subprocess.run")
+    def test_install_windows_exception(self, mock_subprocess_run, mock_platform):
+        """Test Windows installation with subprocess exception."""
+        mock_platform.return_value = "Windows"
+        mock_subprocess_run.side_effect = Exception("Subprocess error")
+
+        with patch("pathlib.Path.exists", return_value=True):
+            with patch("claif_gem.install.ensure_bun_installed", return_value=True):
+                with patch("claif_gem.install.get_install_location", return_value=Path("/tmp")):
+                    with patch("claif_gem.install.install_npm_package_globally", return_value=True):
+                        with patch("claif_gem.install.bundle_all_tools", return_value=Path("/tmp")):
+                            with patch("claif_gem.install.install_gemini_bundled", return_value=True):
+                                with patch("claif_gem.install.prompt_tool_configuration"):
+                                    # Should fall back to standard installation
+                                    result = install_gemini()
+
+                                    assert result["installed"] == ["gemini"]
+                                    assert result["failed"] == []
+
+    @patch("claif_gem.install.platform.system")
+    def test_install_windows_no_installer_script(self, mock_platform):
+        """Test Windows installation when installer script doesn't exist."""
+        mock_platform.return_value = "Windows"
+
+        with patch("pathlib.Path.exists", return_value=False):
+            with patch("claif_gem.install.ensure_bun_installed", return_value=True):
+                with patch("claif_gem.install.get_install_location", return_value=Path("/tmp")):
+                    with patch("claif_gem.install.install_npm_package_globally", return_value=True):
+                        with patch("claif_gem.install.bundle_all_tools", return_value=Path("/tmp")):
+                            with patch("claif_gem.install.install_gemini_bundled", return_value=True):
+                                with patch("claif_gem.install.prompt_tool_configuration"):
+                                    # Should fall back to standard installation
+                                    result = install_gemini()
+
+                                    assert result["installed"] == ["gemini"]
+                                    assert result["failed"] == []
+
     @patch("claif_gem.install.ensure_bun_installed")
     def test_install_bun_failure(self, mock_ensure_bun):
         """Test install when bun installation fails."""
