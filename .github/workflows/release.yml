@@ -104,5 +104,23 @@ jobs:
         with:
           files: dist/*
           generate_release_notes: true
+          body: |
+            ## Installation
+            
+            ### Python Package
+            ```bash
+            pip install claif-gem
+            ```
+            
+            ### Binary Installation
+            Pre-compiled binaries are available in the assets below for Linux, Windows, and macOS.
+            
+            1. Download the appropriate binary for your platform
+            2. Extract the archive 
+            3. Move the binary to a directory in your PATH
+            4. Make it executable (Linux/macOS): `chmod +x claif-gem`
+            5. Run: `claif-gem --help`
+            
+            **Note**: Binary builds are triggered automatically after this release completes.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

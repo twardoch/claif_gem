@@ -126,7 +126,8 @@ class TestModuleQuery:
         with patch("claif_gem.client.query") as mock_gemini_query:
             # Mock an error
             async def mock_error(prompt, options):
-                raise ValueError("Gemini query failed")
+                msg = "Gemini query failed"
+                raise ValueError(msg)
 
             mock_gemini_query.side_effect = mock_error
 
@@ -156,27 +157,26 @@ class TestModuleQuery:
     @pytest.mark.asyncio
     async def test_query_logging(self):
         """Test that query logging works correctly."""
-        with patch("claif_gem.client.query") as mock_gemini_query:
-            with patch("claif_gem.logger") as mock_logger:
-                # Mock the response
-                async def mock_response(prompt, options):
-                    yield Message(role=MessageRole.ASSISTANT, content="Logged response")
+        with patch("claif_gem.client.query") as mock_gemini_query, patch("claif_gem.logger") as mock_logger:
+            # Mock the response
+            async def mock_response(prompt, options):
+                yield Message(role=MessageRole.ASSISTANT, content="Logged response")
 
-                mock_gemini_query.side_effect = mock_response
+            mock_gemini_query.side_effect = mock_response
 
-                # Test query with long prompt
-                long_prompt = "A" * 200
-                messages = []
-                async for msg in query(long_prompt):
-                    messages.append(msg)
+            # Test query with long prompt
+            long_prompt = "A" * 200
+            messages = []
+            async for msg in query(long_prompt):
+                messages.append(msg)
 
-                # Verify logging was called
-                mock_logger.debug.assert_called_once()
-                call_args = mock_logger.debug.call_args[0][0]
-                assert "Querying Gemini with prompt:" in call_args
-                # Should truncate to 100 chars
-                assert "A" * 100 in call_args
-                assert len(call_args) < len(long_prompt) + 50  # Account for prefix
+            # Verify logging was called
+            mock_logger.debug.assert_called_once()
+            call_args = mock_logger.debug.call_args[0][0]
+            assert "Querying Gemini with prompt:" in call_args
+            # Should truncate to 100 chars
+            assert "A" * 100 in call_args
+            assert len(call_args) < len(long_prompt) + 50  # Account for prefix
 
     @pytest.mark.asyncio
     async def test_query_partial_claif_options(self):
@@ -219,6 +219,7 @@ class TestModuleImports:
         with patch("claif_gem.__version__", side_effect=ImportError):
             # Force re-import to trigger fallback
             import importlib
+
             import claif_gem
             importlib.reload(claif_gem)
             assert claif_gem.__version__ == "0.1.0-dev"
@@ -226,7 +227,7 @@ class TestModuleImports:
     def test_all_exports(self):
         """Test that __all__ exports are available."""
         import claif_gem
-        
+
         # Check that all items in __all__ are available
         for item in claif_gem.__all__:
             assert hasattr(claif_gem, item)
@@ -235,8 +236,7 @@ class TestModuleImports:
     def test_claif_import_fallback(self):
         """Test claif import fallback."""
         # This test verifies the dual import pattern works
-        with patch("claif_gem.ClaifOptions") as mock_claif_options:
-            with patch("claif_gem.Message") as mock_message:
-                # These should be imported successfully
-                assert mock_claif_options is not None
-                assert mock_message is not None
+        with patch("claif_gem.ClaifOptions") as mock_claif_options, patch("claif_gem.Message") as mock_message:
+            # These should be imported successfully
+            assert mock_claif_options is not None
+            assert mock_message is not None

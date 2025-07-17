@@ -1,0 +1,191 @@
+name: Build Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0'
+  workflow_run:
+    workflows: ["Release"]
+    types: [completed]
+
+jobs:
+  build-binaries:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact-name: linux-amd64
+            binary-name: claif-gem
+          - os: windows-latest
+            artifact-name: windows-amd64
+            binary-name: claif-gem.exe
+          - os: macos-latest
+            artifact-name: macos-amd64
+            binary-name: claif-gem
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Needed for hatch-vcs
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        version: "latest"
+        python-version: "3.12"
+        enable-cache: true
+    
+    - name: Install dependencies
+      run: |
+        uv venv
+        uv pip install -e ".[dev]"
+        uv pip install pyinstaller
+    
+    - name: Create PyInstaller spec file
+      run: |
+        cat > claif-gem.spec << 'EOF'
+        # -*- mode: python ; coding: utf-8 -*-
+        
+        import os
+        import sys
+        from pathlib import Path
+        
+        # Add src to path
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(SPEC)), 'src'))
+        
+        a = Analysis(
+            ['src/claif_gem/cli.py'],
+            pathex=[],
+            binaries=[],
+            datas=[],
+            hiddenimports=[
+                'claif_gem.cli',
+                'claif_gem.client', 
+                'claif_gem.transport',
+                'claif_gem.types',
+                'claif_gem.install',
+                'claif.common',
+                'fire',
+                'rich',
+                'loguru',
+                'anyio',
+                'tenacity',
+                'shell_functools',
+                'icecream',
+            ],
+            hookspath=[],
+            hooksconfig={},
+            runtime_hooks=[],
+            excludes=[],
+            win_no_prefer_redirects=False,
+            win_private_assemblies=False,
+            cipher=None,
+            noarchive=False,
+        )
+        
+        pyz = PYZ(a.pure, a.zipped_data, cipher=None)
+        
+        exe = EXE(
+            pyz,
+            a.scripts,
+            a.binaries,
+            a.zipfiles,
+            a.datas,
+            [],
+            name='${{ matrix.binary-name }}',
+            debug=False,
+            bootloader_ignore_signals=False,
+            strip=False,
+            upx=True,
+            upx_exclude=[],
+            runtime_tmpdir=None,
+            console=True,
+            disable_windowed_traceback=False,
+            argv_emulation=False,
+            target_arch=None,
+            codesign_identity=None,
+            entitlements_file=None,
+        )
+        EOF
+    
+    - name: Build binary
+      run: |
+        uv run pyinstaller claif-gem.spec
+    
+    - name: Test binary (Linux/macOS)
+      if: runner.os != 'Windows'
+      run: |
+        ./dist/${{ matrix.binary-name }} --help
+    
+    - name: Test binary (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        .\dist\${{ matrix.binary-name }} --help
+    
+    - name: Create archive
+      run: |
+        cd dist
+        if [ "${{ runner.os }}" == "Windows" ]; then
+          7z a claif-gem-${{ matrix.artifact-name }}.zip ${{ matrix.binary-name }}
+        else
+          tar -czf claif-gem-${{ matrix.artifact-name }}.tar.gz ${{ matrix.binary-name }}
+        fi
+    
+    - name: Upload binary artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: binary-${{ matrix.artifact-name }}
+        path: dist/claif-gem-${{ matrix.artifact-name }}.*
+        retention-days: 30
+
+  create-release:
+    needs: build-binaries
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: binary-*
+        path: binaries/
+        merge-multiple: true
+    
+    - name: Extract version from tag
+      id: version
+      run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+    
+    - name: Update existing release with binaries
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref }}
+        files: binaries/*
+        append_body: true
+        body: |
+          
+          ## Binary Downloads
+          
+          Pre-compiled binaries are available for the following platforms:
+          
+          - **Linux (x86_64)**: `claif-gem-linux-amd64.tar.gz`
+          - **Windows (x86_64)**: `claif-gem-windows-amd64.zip`
+          - **macOS (x86_64)**: `claif-gem-macos-amd64.tar.gz`
+          
+          ### Installation Instructions
+          
+          1. Download the appropriate binary for your platform
+          2. Extract the archive
+          3. Move the binary to a directory in your PATH (e.g., `/usr/local/bin`)
+          4. Make it executable (Linux/macOS): `chmod +x claif-gem`
+          5. Run: `claif-gem --help`
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

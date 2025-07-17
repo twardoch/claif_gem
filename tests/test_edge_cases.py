@@ -26,7 +26,7 @@ class TestTransportEdgeCases:
     async def test_disconnect_process_already_none(self, transport):
         """Test disconnect when process is already None."""
         transport.process = None
-        
+
         # Should not raise any exception
         await transport.disconnect()
         assert transport.process is None
@@ -37,9 +37,9 @@ class TestTransportEdgeCases:
         mock_process = Mock()
         mock_process.terminate = Mock()
         mock_process.wait = AsyncMock(side_effect=Exception("Wait failed"))
-        
+
         transport.process = mock_process
-        
+
         # Should not raise, just log the error
         await transport.disconnect()
         assert transport.process is None
@@ -50,13 +50,13 @@ class TestTransportEdgeCases:
         with patch("claif_gem.transport.find_executable", return_value="gemini"):
             options = GeminiOptions(temperature=0.0)
             command = transport._build_command("Test", options)
-            
+
             assert "-t" in command
             assert "0.0" in command
 
             options = GeminiOptions(temperature=1.0)
             command = transport._build_command("Test", options)
-            
+
             assert "-t" in command
             assert "1.0" in command
 
@@ -66,7 +66,7 @@ class TestTransportEdgeCases:
             long_prompt = "A" * 10000
             options = GeminiOptions()
             command = transport._build_command(long_prompt, options)
-            
+
             assert "-p" in command
             assert long_prompt in command
 
@@ -76,7 +76,7 @@ class TestTransportEdgeCases:
             special_prompt = "Hello\nWorld\t\"quoted\"\\"
             options = GeminiOptions()
             command = transport._build_command(special_prompt, options)
-            
+
             assert "-p" in command
             assert special_prompt in command
 
@@ -85,7 +85,7 @@ class TestTransportEdgeCases:
         with patch("claif_gem.transport.find_executable", return_value="gemini"):
             options = GeminiOptions(images=[])
             command = transport._build_command("Test", options)
-            
+
             # Should not include any -i flags
             assert "-i" not in command
 
@@ -94,7 +94,7 @@ class TestTransportEdgeCases:
         with patch("claif_gem.transport.find_executable", return_value="gemini"):
             options = GeminiOptions(images=["/path/to/image.jpg"])
             command = transport._build_command("Test", options)
-            
+
             assert "-i" in command
             assert "/path/to/image.jpg" in command
 
@@ -164,7 +164,8 @@ class TestTransportEdgeCases:
     async def test_send_query_with_zero_retries(self, transport):
         """Test send_query with zero retries."""
         async def mock_execute(*args):
-            raise TransportError("Network error")
+            msg = "Network error"
+            raise TransportError(msg)
 
         with patch.object(transport, "_execute_query", side_effect=mock_execute):
             options = GeminiOptions(retry_count=0)
@@ -180,12 +181,13 @@ class TestTransportEdgeCases:
     async def test_send_query_with_very_short_retry_delay(self, transport):
         """Test send_query with very short retry delay."""
         call_count = 0
-        
+
         async def mock_execute(*args):
             nonlocal call_count
             call_count += 1
             if call_count < 3:
-                raise TransportError("Retryable error")
+                msg = "Retryable error"
+                raise TransportError(msg)
             yield GeminiMessage(content="Success")
 
         with patch.object(transport, "_execute_query", side_effect=mock_execute):
@@ -213,7 +215,7 @@ class TestClientEdgeCases:
         mock_transport = Mock()
         mock_transport.connect = AsyncMock()
         mock_transport.disconnect = AsyncMock()
-        
+
         async def mock_send_query(*args):
             return
             yield  # Make it a generator but yield nothing
@@ -234,7 +236,7 @@ class TestClientEdgeCases:
         mock_transport = Mock()
         mock_transport.connect = AsyncMock()
         mock_transport.disconnect = AsyncMock()
-        
+
         async def mock_send_query(*args):
             yield ResultMessage(error=False, message="No content")
 
@@ -253,7 +255,7 @@ class TestClientEdgeCases:
         mock_transport = Mock()
         mock_transport.connect = AsyncMock()
         mock_transport.disconnect = AsyncMock()
-        
+
         async def mock_send_query(*args):
             yield GeminiMessage(content="First")
             yield ResultMessage(error=False, message="Middle result")
@@ -277,7 +279,8 @@ class TestClientEdgeCases:
     async def test_query_auto_install_with_import_error(self, client):
         """Test auto-install when import fails."""
         async def mock_send_query(*args):
-            raise FileNotFoundError("gemini not found")
+            msg = "gemini not found"
+            raise FileNotFoundError(msg)
 
         client.transport.send_query = mock_send_query
         client.transport.connect = AsyncMock()
@@ -304,7 +307,7 @@ class TestTypesEdgeCases:
             retry_delay=0.0,
             images=[],
         )
-        
+
         assert options.temperature == 0.0
         assert options.max_context_length == 1
         assert options.retry_count == 0
@@ -315,7 +318,7 @@ class TestTypesEdgeCases:
         """Test GeminiMessage with very long content."""
         long_content = "A" * 100000
         msg = GeminiMessage(content=long_content)
-        
+
         assert len(msg.content) == 1
         assert msg.content[0].text == long_content
 
@@ -323,7 +326,7 @@ class TestTypesEdgeCases:
         """Test GeminiMessage with unicode content."""
         unicode_content = "Hello 世界 🌍 🚀"
         msg = GeminiMessage(content=unicode_content)
-        
+
         assert len(msg.content) == 1
         assert msg.content[0].text == unicode_content
 
@@ -347,36 +350,38 @@ class TestIntegrationEdgeCases:
     async def test_full_flow_with_connection_issues(self):
         """Test full flow with intermittent connection issues."""
         from claif_gem.client import GeminiClient
-        
+
         client = GeminiClient()
         call_count = 0
-        
+
         async def mock_send_query(*args):
             nonlocal call_count
             call_count += 1
             if call_count == 1:
-                raise ConnectionError("Connection lost")
+                msg = "Connection lost"
+                raise ConnectionError(msg)
             if call_count == 2:
-                raise TransportError("Timeout")
+                msg = "Timeout"
+                raise TransportError(msg)
             yield GeminiMessage(content="Finally succeeded")
 
         with patch.object(client.transport, "send_query", side_effect=mock_send_query):
             with patch.object(client.transport, "connect", new_callable=AsyncMock):
                 with patch.object(client.transport, "disconnect", new_callable=AsyncMock):
-                    
+
                     # First call should fail
                     with pytest.raises(ConnectionError):
                         async for _ in client.query("Test", GeminiOptions(no_retry=True)):
                             pass
-                    
+
                     # Reset call count for second test
                     call_count = 0
-                    
+
                     # With retries enabled, should eventually succeed
                     messages = []
                     async for msg in client.query("Test", GeminiOptions(retry_count=3)):
                         messages.append(msg)
-                    
+
                     assert len(messages) == 1
                     assert messages[0].content[0].text == "Finally succeeded"
 
@@ -384,9 +389,9 @@ class TestIntegrationEdgeCases:
     async def test_concurrent_queries(self):
         """Test concurrent queries to the same client."""
         from claif_gem.client import GeminiClient
-        
+
         client = GeminiClient()
-        
+
         async def mock_send_query(prompt, options):
             await asyncio.sleep(0.1)  # Simulate network delay
             yield GeminiMessage(content=f"Response to: {prompt}")
@@ -394,22 +399,22 @@ class TestIntegrationEdgeCases:
         with patch.object(client.transport, "send_query", side_effect=mock_send_query):
             with patch.object(client.transport, "connect", new_callable=AsyncMock):
                 with patch.object(client.transport, "disconnect", new_callable=AsyncMock):
-                    
+
                     # Run multiple queries concurrently
                     async def query_task(prompt):
                         messages = []
                         async for msg in client.query(prompt):
                             messages.append(msg)
                         return messages
-                    
+
                     tasks = [
                         query_task("Query 1"),
                         query_task("Query 2"),
                         query_task("Query 3"),
                     ]
-                    
+
                     results = await asyncio.gather(*tasks)
-                    
+
                     assert len(results) == 3
                     assert all(len(result) == 1 for result in results)
                     assert "Query 1" in results[0][0].content[0].text
