@@ -1,13 +1,13 @@
 # this_file: claif_gem/src/claif_gem/client.py
 """Gemini client with OpenAI Responses API compatibility using gemini-cli."""
 
-import os
 import json
-import time
+import os
 import subprocess
+import time
 from collections.abc import Iterator
-from typing import Any, Union, Optional
 from pathlib import Path
+from typing import Any
 
 from openai import NOT_GIVEN, NotGiven
 from openai.types import CompletionUsage
@@ -61,10 +61,11 @@ class ChatCompletions:
 
         This method provides compatibility with OpenAI's chat.completions.create API.
         """
-        # Extract the last user message as the prompt
+        # Build conversation prompt
         prompt = ""
         system_prompt = ""
-        
+        conversation_parts = []
+
         for msg in messages:
             if isinstance(msg, dict):
                 role = msg["role"]
@@ -72,55 +73,55 @@ class ChatCompletions:
             else:
                 role = msg.role
                 content = msg.content
-                
+
             if role == "system":
                 system_prompt = content
             elif role == "user":
-                prompt = content  # Take the last user message
+                conversation_parts.append(f"Human: {content}")
             elif role == "assistant":
-                # For multi-turn conversations, append assistant responses
-                if prompt:
-                    prompt = f"{prompt}\n\nAssistant: {content}\n\nHuman: "
-                    
+                conversation_parts.append(f"Assistant: {content}")
+
+        # Build the final prompt from conversation parts
+        prompt = "\n\n".join(conversation_parts) if conversation_parts else ""
+
         # Build gemini CLI command
         cmd = [self.parent._gemini_cli_path]
-        
+
         # Add model if specified
         if model and model != "gemini-pro":
             cmd.extend(["--model", self._map_model_name(model)])
-            
+
         # Add temperature if specified
         if temperature is not NOT_GIVEN:
             cmd.extend(["--temperature", str(temperature)])
-            
+
         # Add max tokens if specified
         if max_tokens is not NOT_GIVEN:
             cmd.extend(["--max-output-tokens", str(max_tokens)])
-            
+
         # Add system prompt if specified
         if system_prompt:
             # Some gemini-cli versions might support system prompts differently
             # For now, prepend to the prompt
             prompt = f"System: {system_prompt}\n\n{prompt}"
-            
+
         # Add auto-approve flag to avoid interactive prompts
         cmd.append("-y")  # or --yes depending on gemini-cli version
-        
+
         # Add the prompt
         cmd.append(prompt)
-        
+
         # Handle streaming
         if stream is True:
             return self._create_stream(cmd, model)
-        else:
-            return self._create_sync(cmd, model)
+        return self._create_sync(cmd, model)
 
     def _map_model_name(self, model: str) -> str:
         """Map OpenAI-style model names to Gemini model names."""
         model_map = {
             # Common mappings
             "gpt-4": "gemini-1.5-pro",
-            "gpt-4-turbo": "gemini-1.5-pro", 
+            "gpt-4-turbo": "gemini-1.5-pro",
             "gpt-3.5-turbo": "gemini-1.5-flash",
             "gpt-3.5": "gemini-1.5-flash",
             # Pass through Gemini model names
@@ -129,7 +130,7 @@ class ChatCompletions:
             "gemini-flash": "gemini-1.5-flash",
             "gemini-2.0-flash": "gemini-2.0-flash-exp",
         }
-        
+
         # Return mapped model or pass through if not in map
         return model_map.get(model, model)
 
@@ -137,48 +138,51 @@ class ChatCompletions:
         """Create a synchronous chat completion."""
         try:
             # Run gemini CLI
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=self.parent.timeout,
-                check=True
-            )
-            
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=self.parent.timeout, check=True)
+
             # Extract response content
             content = result.stdout.strip()
-            
+
             # Try to parse as JSON if it looks like JSON
             if content.startswith("{") or content.startswith("["):
                 try:
                     data = json.loads(content)
-                    # Extract text from JSON response if possible
+                    # Extract text from Gemini JSON response
                     if isinstance(data, dict):
-                        content = data.get("text", data.get("response", str(data)))
+                        # Handle Gemini response format
+                        if data.get("candidates"):
+                            candidate = data["candidates"][0]
+                            if "content" in candidate and "parts" in candidate["content"]:
+                                parts = candidate["content"]["parts"]
+                                if parts and "text" in parts[0]:
+                                    content = parts[0]["text"]
+                        else:
+                            # Fallback to simple text or response field
+                            content = data.get("text", data.get("response", str(data)))
                 except json.JSONDecodeError:
                     pass  # Use raw content
-                    
+
         except subprocess.TimeoutExpired:
-            raise TimeoutError(f"Gemini CLI timed out after {self.parent.timeout} seconds")
+            msg = f"Gemini CLI timed out after {self.parent.timeout} seconds"
+            raise TimeoutError(msg)
         except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Gemini CLI error: {e.stderr}")
+            msg = f"Gemini CLI error: {e.stderr}"
+            raise RuntimeError(msg)
         except FileNotFoundError:
-            raise RuntimeError(
-                f"Gemini CLI not found at {cmd[0]}. "
-                f"Please install it or set GEMINI_CLI_PATH environment variable."
-            )
-            
+            msg = f"Gemini CLI not found at {cmd[0]}. Please install it or set GEMINI_CLI_PATH environment variable."
+            raise RuntimeError(msg)
+
         # Create ChatCompletion response
         timestamp = int(time.time())
         response_id = f"chatcmpl-{timestamp}{os.getpid()}"
-        
+
         # Estimate token counts (rough approximation)
         prompt_tokens = len(cmd[-1].split()) * 2  # Rough estimate
         completion_tokens = len(content.split()) * 2  # Rough estimate
-        
+
         return ChatCompletion(
             id=response_id,
-            object="chat.completion", 
+            object="chat.completion",
             created=timestamp,
             model=model,
             choices=[
@@ -199,17 +203,15 @@ class ChatCompletions:
             ),
         )
 
-    def _create_stream(
-        self, cmd: list[str], model: str
-    ) -> Iterator[ChatCompletionChunk]:
+    def _create_stream(self, cmd: list[str], model: str) -> Iterator[ChatCompletionChunk]:
         """Create a streaming chat completion."""
         # For now, implement a simple non-streaming fallback
         # In a real implementation, this would use gemini-cli's streaming mode if available
         response = self._create_sync(cmd, model)
-        
+
         timestamp = int(time.time())
         chunk_id = f"chatcmpl-{timestamp}{os.getpid()}"
-        
+
         # Initial chunk with role
         yield ChatCompletionChunk(
             id=chunk_id,
@@ -225,7 +227,7 @@ class ChatCompletions:
                 )
             ],
         )
-        
+
         # Content chunk
         yield ChatCompletionChunk(
             id=chunk_id,
@@ -241,7 +243,7 @@ class ChatCompletions:
                 )
             ],
         )
-        
+
         # Final chunk
         yield ChatCompletionChunk(
             id=chunk_id,
@@ -285,14 +287,14 @@ class GeminiClient:
         """
         self.api_key = api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
         self.timeout = timeout
-        
+
         # Find gemini CLI path
         self._gemini_cli_path = self._find_gemini_cli(cli_path)
-        
+
         # Set API key environment variable if provided
         if self.api_key:
             os.environ["GEMINI_API_KEY"] = self.api_key
-            
+
         # Create namespace structure to match OpenAI client
         self.chat = Chat(self)
 
@@ -303,16 +305,16 @@ class GeminiClient:
             path = Path(cli_path)
             if path.exists() and path.is_file():
                 return str(path)
-            else:
-                raise FileNotFoundError(f"Gemini CLI not found at {cli_path}")
-                
+            msg = f"Gemini CLI not found at {cli_path}"
+            raise FileNotFoundError(msg)
+
         # Check environment variable
         env_path = os.getenv("GEMINI_CLI_PATH")
         if env_path:
             path = Path(env_path)
             if path.exists() and path.is_file():
                 return str(path)
-                
+
         # Search common locations
         search_paths = [
             "gemini",  # In PATH
@@ -325,28 +327,30 @@ class GeminiClient:
             "C:\\Program Files\\Gemini\\gemini.exe",
             "C:\\Program Files (x86)\\Gemini\\gemini.exe",
         ]
-        
+
         for search_path in search_paths:
             path = Path(search_path).expanduser()
             if path.exists() and path.is_file():
                 return str(path)
-                
+
             # Also try with .exe extension on Windows
             if os.name == "nt" and not search_path.endswith(".exe"):
                 exe_path = Path(f"{search_path}.exe").expanduser()
                 if exe_path.exists() and exe_path.is_file():
                     return str(exe_path)
-                    
+
         # Try to find in PATH
         import shutil
+
         gemini_path = shutil.which("gemini") or shutil.which("gemini-cli")
         if gemini_path:
             return gemini_path
-            
-        raise FileNotFoundError(
+
+        msg = (
             "Gemini CLI not found. Please install it and ensure it's in your PATH, "
             "or set GEMINI_CLI_PATH environment variable, or pass cli_path parameter."
         )
+        raise FileNotFoundError(msg)
 
     # Convenience method for backward compatibility
     def create(self, **kwargs) -> ChatCompletion:

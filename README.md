@@ -618,6 +618,198 @@ Benefits of Bun:
 - CLI arguments
 - Sensible defaults
 
+## Testing
+
+The `claif_gem` package includes comprehensive tests to ensure robust functionality:
+
+### Running Tests
+
+```bash
+# Install with test dependencies
+pip install -e ".[test]"
+
+# Run all tests
+uvx hatch test
+
+# Run specific test modules
+uvx hatch test -- tests/test_functional.py -v
+uvx hatch test -- tests/test_client.py -v
+
+# Run with coverage
+uvx hatch test -- --cov=src/claif_gem --cov-report=html
+```
+
+### Test Structure
+
+```
+tests/
+├── test_functional.py       # End-to-end functionality tests
+├── test_client.py          # Client API tests  
+├── test_transport.py       # Subprocess communication tests
+├── test_types.py           # Type conversion tests
+└── conftest.py             # Test fixtures and configuration
+```
+
+### Example Test Usage
+
+The functional tests demonstrate how to use `claif_gem` effectively:
+
+```python
+# Test basic query functionality
+def test_basic_query():
+    client = GeminiClient()
+    
+    response = client.chat.completions.create(
+        model="gemini-1.5-flash",
+        messages=[{"role": "user", "content": "Hello Gemini"}]
+    )
+    
+    assert isinstance(response, ChatCompletion)
+    assert response.choices[0].message.role == "assistant"
+    assert len(response.choices[0].message.content) > 0
+
+# Test streaming responses
+def test_streaming():
+    client = GeminiClient()
+    
+    stream = client.chat.completions.create(
+        model="gemini-1.5-flash",
+        messages=[{"role": "user", "content": "Count to 3"}],
+        stream=True
+    )
+    
+    chunks = list(stream)
+    assert len(chunks) > 0
+    
+    # Reconstruct full message
+    content = "".join(
+        chunk.choices[0].delta.content or ""
+        for chunk in chunks
+        if chunk.choices and chunk.choices[0].delta.content
+    )
+    assert len(content) > 0
+
+# Test parameter passing
+def test_with_parameters():
+    client = GeminiClient()
+    
+    response = client.chat.completions.create(
+        model="gemini-1.5-pro",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Write a hello world function"}
+        ],
+        temperature=0.7,
+        max_tokens=100
+    )
+    
+    assert response.model == "gemini-1.5-pro"
+    assert response.usage.total_tokens > 0
+
+# Test model name mapping
+def test_model_mapping():
+    client = GeminiClient()
+    
+    # OpenAI model names should be mapped to Gemini equivalents
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",  # Maps to gemini-1.5-flash
+        messages=[{"role": "user", "content": "Hello"}]
+    )
+    
+    # Verify the mapping worked correctly
+    assert "gemini" in response.model.lower()
+```
+
+### Mock Testing for CI/CD
+
+The tests use comprehensive mocking to work in CI environments without requiring the actual Gemini CLI:
+
+```python
+from unittest.mock import patch, MagicMock
+import subprocess
+
+@patch("claif_gem.client.subprocess.run")
+@patch("shutil.which")
+def test_client_mocking(mock_which, mock_run):
+    # Mock CLI discovery
+    mock_which.return_value = "/usr/local/bin/gemini"
+    
+    # Mock subprocess response
+    mock_response = {
+        "candidates": [{
+            "content": {"parts": [{"text": "Hello from Gemini!"}]}
+        }]
+    }
+    mock_run.return_value = MagicMock(
+        returncode=0, 
+        stdout=json.dumps(mock_response), 
+        stderr=""
+    )
+    
+    client = GeminiClient()
+    response = client.chat.completions.create(
+        model="gemini-1.5-flash",
+        messages=[{"role": "user", "content": "Test"}]
+    )
+    
+    # Verify subprocess was called correctly
+    mock_run.assert_called_once()
+    call_args = mock_run.call_args
+    cmd = call_args[0][0]
+    assert "gemini" in cmd[0]
+    assert "--model" in cmd
+    assert "gemini-1.5-flash" in cmd
+```
+
+### Testing Subprocess Communication
+
+```python
+# Test CLI command generation
+def test_command_building():
+    from claif_gem.client import GeminiClient
+    
+    # Mock the transport to intercept command building
+    with patch("claif_gem.client.subprocess.run") as mock_run:
+        mock_run.return_value = MagicMock(returncode=0, stdout="test", stderr="")
+        
+        client = GeminiClient()
+        client.chat.completions.create(
+            model="gemini-1.5-pro",
+            messages=[{"role": "user", "content": "Test"}],
+            temperature=0.8,
+            max_tokens=500
+        )
+        
+        # Verify command structure
+        call_args = mock_run.call_args[0][0]
+        assert "--temperature" in call_args
+        assert "0.8" in call_args
+        assert "--max-output-tokens" in call_args
+        assert "500" in call_args
+
+# Test error handling
+def test_error_handling():
+    from subprocess import CalledProcessError
+    
+    with patch("claif_gem.client.subprocess.run") as mock_run:
+        mock_run.side_effect = CalledProcessError(
+            returncode=1, 
+            cmd=["gemini"], 
+            stderr="API quota exceeded"
+        )
+        
+        client = GeminiClient()
+        
+        with pytest.raises(RuntimeError) as exc_info:
+            client.chat.completions.create(
+                model="gemini-1.5-flash",
+                messages=[{"role": "user", "content": "Test"}]
+            )
+        
+        assert "Gemini CLI error" in str(exc_info.value)
+        assert "API quota exceeded" in str(exc_info.value)
+```
+
 ## API Compatibility
 
 This package is fully compatible with the OpenAI Python client API:
