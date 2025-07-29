@@ -1,53 +1,7 @@
-# this_file: src/claif_gem/__init__.py
-"""Claif Gemini wrapper."""
+# this_file: claif_gem/src/claif_gem/__init__.py
+"""Claif provider for Google Gemini with OpenAI Responses API compatibility."""
 
-from collections.abc import AsyncIterator
+from claif_gem.__version__ import __version__
+from claif_gem.client import GeminiClient
 
-from loguru import logger
-
-try:
-    from claif.common import ClaifOptions, Message
-except ImportError:
-    from claif.common import ClaifOptions, Message
-from claif_gem.client import query as gemini_query
-from claif_gem.types import GeminiOptions
-
-try:
-    from claif_gem.__version__ import __version__
-except ImportError:
-    __version__ = "0.1.0-dev"
-
-
-async def query(
-    prompt: str,
-    options: ClaifOptions | None = None,
-) -> AsyncIterator[Message]:
-    """Query Gemini using Claif interface.
-
-    Args:
-        prompt: The prompt to send to Gemini
-        options: Optional Claif options
-
-    Yields:
-        Messages from Gemini
-    """
-    if options is None:
-        options = ClaifOptions()
-
-    # Convert Claif options to Gemini options
-    gemini_options = GeminiOptions(
-        model=options.model,
-        temperature=options.temperature,
-        system_prompt=options.system_prompt,
-        timeout=options.timeout,
-        verbose=options.verbose,
-    )
-
-    logger.debug(f"Querying Gemini with prompt: {prompt[:100]}...")
-
-    # Pass through to Gemini client
-    async for message in gemini_query(prompt, gemini_options):
-        yield message
-
-
-__all__ = ["GeminiOptions", "query"]
+__all__ = ["GeminiClient", "__version__"]

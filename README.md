@@ -1,26 +1,42 @@
 # claif_gem - Gemini Provider for Claif
 
+A Claif provider for Google Gemini with full OpenAI client API compatibility. This package wraps the `gemini-cli` command-line tool to provide a consistent interface following the `client.chat.completions.create()` pattern.
+
+## Features
+
+- **OpenAI Client API Compatible**: Use the familiar `client.chat.completions.create()` pattern
+- **Full Type Safety**: Returns standard `ChatCompletion` and `ChatCompletionChunk` objects
+- **Streaming Support**: Real-time streaming with proper chunk handling  
+- **Subprocess Management**: Reliable communication with Gemini CLI
+- **Auto-approval Mode**: Streamlined workflows without interruptions
+- **Cross-platform Support**: Works on Windows, macOS, and Linux
+- **Fire-based CLI**: Rich terminal interface with multiple output formats
+
 ## Quickstart
 
 ```bash
-# Install and start using Gemini
+# Install
 pip install claif_gem
-claif-gem query "Explain quantum computing in simple terms"
 
-# Or use it with the Claif framework
-pip install claif[all]
-claif query "Write a haiku about Python" --provider gemini
+# Basic usage - OpenAI compatible
+python -c "
+from claif_gem import GeminiClient
+client = GeminiClient()
+response = client.chat.completions.create(
+    messages=[{'role': 'user', 'content': 'Hello Gemini!'}],
+    model='gemini-1.5-flash'
+)
+print(response.choices[0].message.content)
+"
 
-# Stream responses with live display
-claif-gem stream "Tell me a story about AI"
-
-# Use auto-approve mode for faster responses
-claif-gem query "Analyze this code" --auto-approve --yes-mode
+# CLI usage
+claif-gem query "Explain quantum computing"
+claif-gem chat --model gemini-1.5-pro
 ```
 
 ## What is claif_gem?
 
-`claif_gem` is the Google Gemini provider for the Claif framework. It wraps the [Gemini CLI](https://github.com/google-gemini/gemini-cli/) tool to integrate Google's powerful Gemini language models into the unified Claif ecosystem through subprocess management and clean message translation.
+`claif_gem` is the Google Gemini provider for the Claif framework with full OpenAI client API compatibility. It wraps the [Gemini CLI](https://github.com/google-gemini/gemini-cli/) tool to integrate Google's powerful Gemini language models into the unified Claif ecosystem through subprocess management and clean message translation.
 
 **Key Features:**
 - **Subprocess-based integration** - Reliable communication with Gemini CLI
@@ -81,21 +97,69 @@ cd claif_gem
 pip install -e ".[dev,test]"
 ```
 
+## Usage
+
+### Basic Usage (OpenAI-Compatible)
+
+```python
+from claif_gem import GeminiClient
+
+# Initialize the client
+client = GeminiClient(
+    api_key="your-api-key",  # Optional, uses GEMINI_API_KEY env var
+    cli_path="/path/to/gemini"  # Optional, auto-discovers
+)
+
+# Create a chat completion - exactly like OpenAI
+response = client.chat.completions.create(
+    model="gemini-1.5-flash",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant"},
+        {"role": "user", "content": "Explain machine learning"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+# Access the response
+print(response.choices[0].message.content)
+print(f"Model: {response.model}")
+print(f"Usage: {response.usage}")
+```
+
+### Streaming Responses
+
+```python
+from claif_gem import GeminiClient
+
+client = GeminiClient()
+
+# Stream responses in real-time
+stream = client.chat.completions.create(
+    model="gemini-1.5-pro",
+    messages=[
+        {"role": "user", "content": "Write a story about space exploration"}
+    ],
+    stream=True
+)
+
+# Process streaming chunks
+for chunk in stream:
+    if chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="", flush=True)
+```
+
 ## CLI Usage
 
-`claif_gem` provides a Fire-based CLI for direct interaction with Gemini.
-
-### Basic Commands
-
 ```bash
-# Simple query
+# Basic query
 claif-gem query "Explain machine learning"
 
-# Query with specific model
-claif-gem query "Write Python code for binary search" --model gemini-2.5-pro
+# With specific model
+claif-gem query "Write Python code for binary search" --model gemini-1.5-pro
 
-# Set parameters
-claif-gem query "Analyze this data" --temperature 0.3 --max-context 8000
+# Interactive chat mode
+claif-gem chat --model gemini-2.0-flash-exp
 
 # With system prompt
 claif-gem query "Translate to French" --system "You are a professional translator"
@@ -553,6 +617,55 @@ Benefits of Bun:
 - Config files
 - CLI arguments
 - Sensible defaults
+
+## API Compatibility
+
+This package is fully compatible with the OpenAI Python client API:
+
+```python
+# You can use it as a drop-in replacement
+from claif_gem import GeminiClient as OpenAI
+
+client = OpenAI()
+# Now use exactly like the OpenAI client
+response = client.chat.completions.create(
+    model="gemini-1.5-flash",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+```
+
+## Migration from Old Async API
+
+If you were using the old async-based Claif API:
+
+```python
+# Old API (deprecated)
+import asyncio
+from claif_gem import query
+
+async def old_way():
+    async for message in query("Hello Gemini"):
+        print(message.content)
+    
+# New API (OpenAI-compatible)
+from claif_gem import GeminiClient
+
+def new_way():
+    client = GeminiClient()
+    response = client.chat.completions.create(
+        messages=[{"role": "user", "content": "Hello Gemini"}],
+        model="gemini-1.5-flash"
+    )
+    print(response.choices[0].message.content)
+```
+
+### Key Changes
+
+1. **Synchronous by default**: No more `async/await` for basic usage
+2. **OpenAI-compatible structure**: `client.chat.completions.create()` pattern
+3. **Standard message format**: `[{"role": "user", "content": "..."}]`
+4. **Streaming support**: Use `stream=True` for real-time responses
+5. **Type-safe responses**: Returns `ChatCompletion` objects from OpenAI types
 
 ## Best Practices
 

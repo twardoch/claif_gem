@@ -1,9 +1,7 @@
 """Edge case tests for claif_gem components."""
 
 import asyncio
-import json
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from claif.common import TransportError
@@ -73,7 +71,7 @@ class TestTransportEdgeCases:
     def test_build_command_with_special_characters(self, transport):
         """Test command building with special characters in prompt."""
         with patch("claif_gem.transport.find_executable", return_value="gemini"):
-            special_prompt = "Hello\nWorld\t\"quoted\"\\"
+            special_prompt = 'Hello\nWorld\t"quoted"\\'
             options = GeminiOptions()
             command = transport._build_command(special_prompt, options)
 
@@ -163,6 +161,7 @@ class TestTransportEdgeCases:
     @pytest.mark.asyncio
     async def test_send_query_with_zero_retries(self, transport):
         """Test send_query with zero retries."""
+
         async def mock_execute(*args):
             msg = "Network error"
             raise TransportError(msg)
@@ -278,6 +277,7 @@ class TestClientEdgeCases:
     @pytest.mark.asyncio
     async def test_query_auto_install_with_import_error(self, client):
         """Test auto-install when import fails."""
+
         async def mock_send_query(*args):
             msg = "gemini not found"
             raise FileNotFoundError(msg)
@@ -368,7 +368,6 @@ class TestIntegrationEdgeCases:
         with patch.object(client.transport, "send_query", side_effect=mock_send_query):
             with patch.object(client.transport, "connect", new_callable=AsyncMock):
                 with patch.object(client.transport, "disconnect", new_callable=AsyncMock):
-
                     # First call should fail
                     with pytest.raises(ConnectionError):
                         async for _ in client.query("Test", GeminiOptions(no_retry=True)):
@@ -399,7 +398,6 @@ class TestIntegrationEdgeCases:
         with patch.object(client.transport, "send_query", side_effect=mock_send_query):
             with patch.object(client.transport, "connect", new_callable=AsyncMock):
                 with patch.object(client.transport, "disconnect", new_callable=AsyncMock):
-
                     # Run multiple queries concurrently
                     async def query_task(prompt):
                         messages = []

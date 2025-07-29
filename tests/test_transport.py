@@ -1,7 +1,6 @@
 # this_file: claif_gem/tests/test_transport.py
 """Tests for the Gemini transport layer."""
 
-import asyncio
 from unittest.mock import AsyncMock, patch
 
 import pytest

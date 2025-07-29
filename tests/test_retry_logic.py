@@ -2,7 +2,7 @@
 """Test retry logic for quota and rate limit errors."""
 
 import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from claif.common import TransportError

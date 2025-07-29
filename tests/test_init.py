@@ -1,6 +1,6 @@
 """Test suite for claif_gem.__init__ module."""
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 from claif.common import ClaifOptions, Message, MessageRole
@@ -212,6 +212,7 @@ class TestModuleImports:
         """Test successful version import."""
         with patch("claif_gem.__version__", "1.0.0"):
             from claif_gem import __version__
+
             assert __version__ == "1.0.0"
 
     def test_version_import_fallback(self):
@@ -221,6 +222,7 @@ class TestModuleImports:
             import importlib
 
             import claif_gem
+
             importlib.reload(claif_gem)
             assert claif_gem.__version__ == "0.1.0-dev"
 

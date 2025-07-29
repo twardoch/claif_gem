@@ -15,15 +15,16 @@ class TestInstallFallbacks:
     def test_install_fallback_imports(self):
         """Test install functions when claif import fails."""
         # Mock import error for claif
-        with patch.dict('sys.modules', {'claif.common.utils': None}):
-            with patch.dict('sys.modules', {'claif.install': None}):
+        with patch.dict("sys.modules", {"claif.common.utils": None}):
+            with patch.dict("sys.modules", {"claif.install": None}):
                 # Force reimport to trigger fallback
-                if 'claif_gem.install' in sys.modules:
-                    del sys.modules['claif_gem.install']
+                if "claif_gem.install" in sys.modules:
+                    del sys.modules["claif_gem.install"]
 
                 # This should trigger the fallback imports
                 try:
                     import claif_gem.install
+
                     # If we get here, the fallback worked
                     assert True
                 except ImportError:
@@ -33,14 +34,15 @@ class TestInstallFallbacks:
     def test_prompt_tool_configuration_fallback(self):
         """Test prompt_tool_configuration fallback implementation."""
         # Mock import error for claif
-        with patch.dict('sys.modules', {'claif.common.utils': None}):
-            with patch.dict('sys.modules', {'claif.install': None}):
+        with patch.dict("sys.modules", {"claif.common.utils": None}):
+            with patch.dict("sys.modules", {"claif.install": None}):
                 # Force reimport to trigger fallback
-                if 'claif_gem.install' in sys.modules:
-                    del sys.modules['claif_gem.install']
+                if "claif_gem.install" in sys.modules:
+                    del sys.modules["claif_gem.install"]
 
                 try:
                     import claif_gem.install
+
                     # Test the fallback function
                     claif_gem.install.prompt_tool_configuration("test", ["cmd1", "cmd2"])
                     # Should not raise any exception
@@ -72,13 +74,14 @@ class TestVersionHandling:
     def test_version_import_error(self):
         """Test version import error handling."""
         # Test the version import fallback
-        with patch.dict('sys.modules', {'claif_gem.__version__': None}):
+        with patch.dict("sys.modules", {"claif_gem.__version__": None}):
             # Force reimport to trigger fallback
-            if 'claif_gem' in sys.modules:
-                del sys.modules['claif_gem']
+            if "claif_gem" in sys.modules:
+                del sys.modules["claif_gem"]
 
             try:
                 import claif_gem
+
                 # Should fall back to dev version
                 assert claif_gem.__version__ == "0.1.0-dev"
             except ImportError:
@@ -212,6 +215,7 @@ class TestSpecialCases:
 
         # Test with reset
         import claif_gem.client
+
         claif_gem.client._client = None
 
         client3 = _get_client()

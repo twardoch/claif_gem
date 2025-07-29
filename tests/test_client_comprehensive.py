@@ -1,6 +1,6 @@
 """Comprehensive test suite for claif_gem client."""
 
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from claif.common.types import Message, MessageRole, TextBlock
