@@ -1,0 +1,213 @@
+# this_file: src_docs/mkdocs.yml
+# MkDocs configuration for claif_gem documentation
+# Uses Material theme for modern, responsive design
+
+site_name: claif_gem Documentation
+site_description: A Claif provider for Google Gemini with OpenAI client API compatibility
+site_author: Adam Twardoch
+site_url: https://twardoch.github.io/claif_gem/
+
+# Repository settings
+repo_name: twardoch/claif_gem
+repo_url: https://github.com/twardoch/claif_gem
+edit_uri: edit/main/src_docs/md/
+
+# Build settings
+docs_dir: md
+site_dir: ../docs
+
+# Theme configuration
+theme:
+  name: material
+  
+  # Color scheme
+  palette:
+    # Primary palette for Material Design
+    - scheme: default
+      primary: deep purple
+      accent: pink
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    
+    # Dark mode palette
+    - scheme: slate
+      primary: deep purple
+      accent: pink
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  
+  # Typography
+  font:
+    text: Roboto
+    code: Roboto Mono
+  
+  # Features
+  features:
+    - navigation.tabs           # Top-level navigation tabs
+    - navigation.tabs.sticky    # Sticky navigation tabs
+    - navigation.sections       # Navigation sections
+    - navigation.expand         # Expand navigation by default
+    - navigation.path           # Show navigation path
+    - navigation.indexes        # Enable section index pages
+    - navigation.top            # Back to top button
+    - search.highlight          # Highlight search terms
+    - search.share             # Share search results
+    - search.suggest           # Search suggestions
+    - content.code.copy        # Copy code blocks
+    - content.code.annotate    # Code annotations
+    - content.tabs.link        # Link tabs across pages
+    - content.tooltips         # Tooltips for abbreviations
+    - toc.follow              # Follow table of contents
+    - toc.integrate           # Integrate TOC with sidebar
+  
+  # Logo and favicon
+  icon:
+    logo: material/cloud-braces
+    repo: fontawesome/brands/github
+  
+  # Language
+  language: en
+
+# Navigation structure
+nav:
+  - Home: index.md
+  - Getting Started:
+    - 'quickstart.md'
+    - 'installation.md'
+  - User Guide:
+    - 'usage.md'
+    - 'configuration.md'
+    - 'cli-reference.md'
+  - Developer Guide:
+    - 'api-reference.md'
+    - 'architecture.md'
+    - 'testing.md'
+    - 'contributing.md'
+
+# Plugins
+plugins:
+  # Built-in search
+  - search:
+      lang: en
+      separator: '[\s\-\.]+' 
+  
+  # Git revision information
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
+  
+  # Minification for production
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+        remove_empty_space: true
+      cache_safe: true
+
+# Markdown extensions
+markdown_extensions:
+  # Python Markdown extensions
+  - abbr                    # Abbreviations
+  - admonition             # Admonition blocks
+  - attr_list              # Attribute lists
+  - def_list               # Definition lists
+  - footnotes              # Footnotes
+  - md_in_html             # Markdown in HTML
+  - toc:                   # Table of contents
+      permalink: true
+      permalink_title: Anchor link to this section
+      toc_depth: 3
+  - tables                 # Tables
+  - meta                   # Metadata
+  
+  # PyMdown Extensions
+  - pymdownx.arithmatex:   # Math support
+      generic: true
+  - pymdownx.betterem:     # Better emphasis
+      smart_enable: all
+  - pymdownx.caret         # Caret notation
+  - pymdownx.details       # Collapsible details
+  - pymdownx.emoji:        # Emoji support
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:    # Code highlighting
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite  # Inline code highlighting
+  - pymdownx.keys          # Keyboard keys
+  - pymdownx.mark          # Mark text
+  - pymdownx.smartsymbols  # Smart symbols
+  - pymdownx.snippets:     # Include snippets
+      auto_append:
+        - includes/abbreviations.md
+  - pymdownx.superfences:  # Code blocks
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:       # Tabbed content
+      alternate_style: true
+  - pymdownx.tasklist:     # Task lists
+      custom_checkbox: true
+  - pymdownx.tilde         # Tilde notation
+
+# Extra CSS and JavaScript
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+# Extra variables for templates
+extra:
+  version:
+    provider: mike
+  
+  # Social links
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/twardoch/claif_gem
+      name: GitHub Repository
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/claif_gem/
+      name: PyPI Package
+    - icon: fontawesome/solid/envelope
+      link: mailto:adam+github@twardoch.com
+      name: Contact Author
+  
+  # Analytics (optional)
+  analytics:
+    provider: google
+    property: !ENV GOOGLE_ANALYTICS_KEY
+  
+  # Generator notice
+  generator: false
+  
+  # Custom variables
+  project:
+    name: claif_gem
+    description: A Claif provider for Google Gemini with OpenAI client API compatibility
+    author: Adam Twardoch
+    license: MIT
+    python_version: ">=3.12"
+    version: "1.0.30"
+
+# Copyright notice
+copyright: Copyright &copy; 2025 Adam Twardoch. MIT License.
+
+# Site-wide configuration
+strict: true
+dev_addr: '127.0.0.1:8000'
+
+# Watch additional files during development
+watch:
+  - ../src/claif_gem/
+  - ../README.md
+  - ../CHANGELOG.md

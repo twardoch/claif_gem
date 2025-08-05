@@ -1,0 +1,143 @@
+# this_file: _github/ISSUE_TEMPLATE/feature_request.yml
+name: 🚀 Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
+labels: ["enhancement", "feature-request"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! 
+        
+        Please search existing issues and discussions before creating a new feature request.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature Summary
+      description: A clear and concise description of the feature you'd like to see
+      placeholder: Brief summary of the feature...
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Description
+      description: What problem does this feature solve? What is the current limitation?
+      placeholder: Describe the problem or limitation this feature would address...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: How would you like this feature to work?
+      placeholder: Describe your proposed solution...
+    validations:
+      required: true
+
+  - type: textarea
+    id: api
+    attributes:
+      label: Proposed API
+      description: How would users interact with this feature? (code examples)
+      render: python
+      placeholder: |
+        # Example of how the feature would be used
+        from claif_gem import GeminiClient
+        
+        client = GeminiClient()
+        # Your proposed API usage here
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What alternative solutions or features have you considered?
+      placeholder: Describe any alternative approaches you've considered...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How important is this feature to you?
+      options:
+        - Low - Nice to have
+        - Medium - Would be helpful
+        - High - Important for my use case
+        - Critical - Blocking my workflow
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated Complexity
+      description: How complex do you think this feature would be to implement?
+      options:
+        - Simple - Small change or addition
+        - Medium - Moderate development effort
+        - Complex - Significant development effort
+        - Major - Large architectural changes
+        - Unknown - I'm not sure
+    validations:
+      required: false
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: Use Cases
+      description: Describe specific use cases for this feature
+      placeholder: |
+        1. Use case one...
+        2. Use case two...
+        3. Use case three...
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context, examples, or references
+      placeholder: Add any other context, links to similar features in other tools, etc...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: compatibility
+    attributes:
+      label: Compatibility Considerations
+      description: Please consider these aspects
+      options:
+        - label: This feature should maintain backward compatibility
+          required: false
+        - label: This feature could be implemented as an optional dependency
+          required: false
+        - label: This feature should work across all supported platforms
+          required: false
+        - label: This feature should be well-documented with examples
+          required: false
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Are you interested in contributing?
+      options:
+        - label: I am willing to implement this feature myself
+          required: false
+        - label: I can help with testing the implementation
+          required: false
+        - label: I can help with documentation
+          required: false
+        - label: I can provide detailed requirements and use cases
+          required: false
